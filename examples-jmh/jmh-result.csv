@@ -1,0 +1,10 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: length","Param: randomSourceName"
+"uk.ac.sussex.gdsc.examples.core.utils.rng.StringSamplerBenchmark.runAsciiStringSampler","avgt",1,10,38882.265214,3641.943884,"us/op",1024,MWC_256
+"uk.ac.sussex.gdsc.examples.core.utils.rng.StringSamplerBenchmark.runNextBytesAndHexEncodeHex","avgt",1,10,19065.936679,4607.303653,"us/op",1024,MWC_256
+"uk.ac.sussex.gdsc.examples.core.utils.rng.StringSamplerBenchmark.runRadixStringSampler","avgt",1,10,17830.885132,2026.497898,"us/op",1024,MWC_256
+"uk.ac.sussex.gdsc.examples.core.utils.rng.StringSamplerBenchmark.runRandomDataGenerator_nextHexStringModified","avgt",1,10,135548.865518,12465.555070,"us/op",1024,MWC_256
+"uk.ac.sussex.gdsc.examples.core.utils.rng.StringSamplerBenchmark.runRandomDataGenerator_nextHexStringOriginal","avgt",1,10,186967.606416,35722.293305,"us/op",1024,MWC_256
+"uk.ac.sussex.gdsc.examples.core.utils.rng.StringSamplerBenchmark.runRandomStringGeneratorWith16CodePoints","avgt",1,10,113366.557567,848.966815,"us/op",1024,MWC_256
+"uk.ac.sussex.gdsc.examples.core.utils.rng.StringSamplerBenchmark.runRandomStringGeneratorWithCharArray","avgt",1,10,286391.268250,44233.884853,"us/op",1024,MWC_256
+"uk.ac.sussex.gdsc.examples.core.utils.rng.StringSamplerBenchmark.runRandomStringUtilsWith16CodePoints","avgt",1,10,70557.456270,11021.701413,"us/op",1024,MWC_256
+"uk.ac.sussex.gdsc.examples.core.utils.rng.StringSamplerBenchmark.runRandomStringUtilsWithCharArray","avgt",1,10,64052.320890,8495.141705,"us/op",1024,MWC_256
