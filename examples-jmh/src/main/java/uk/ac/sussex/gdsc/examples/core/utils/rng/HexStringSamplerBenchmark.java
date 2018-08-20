@@ -59,7 +59,7 @@ import uk.ac.sussex.gdsc.core.utils.rng.RadixStringSampler;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @State(Scope.Benchmark)
 @Fork(value = 1, jvmArgs = { "-server", "-Xms128M", "-Xmx128M" })
-public class StringSamplerBenchmark {
+public class HexStringSamplerBenchmark {
     /** Number of samples per run. */
     private static final int NUM_SAMPLES = 10000;
 
