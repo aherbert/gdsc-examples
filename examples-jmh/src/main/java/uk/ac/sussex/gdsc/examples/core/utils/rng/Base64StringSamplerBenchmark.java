@@ -99,11 +99,9 @@ public class Base64StringSamplerBenchmark {
          *      "https://commons.apache.org/proper/commons-rng/userguide/rng.html">Commons
          *      RNG user guide</a>
          */
-        @Param({
-                // "SPLIT_MIX_64",
-                "MWC_256",
-                // "KISS", "WELL_1024_A", "WELL_44497_B"
-        })
+        @Param({ // "SPLIT_MIX_64", //"MWC_256",
+                 // "KISS", "WELL_1024_A",
+                "WELL_44497_B" })
         private String randomSourceName;
 
         /** RNG. */
@@ -173,6 +171,34 @@ public class Base64StringSamplerBenchmark {
      * @param length  the length
      * @param bh      Data sink.
      */
+    // Added for a reference 8 samples per integer rather than 5 1/3 per integer
+    @Benchmark
+    public void runRadixStringSamplerHex(Sources sources, StringLength length, Blackhole bh) {
+        final UniformRandomProvider r = sources.getGenerator();
+        final int len = length.length;
+        final RadixStringSampler s = new RadixStringSampler(r, len, 16);
+        runSample(s::sample, bh);
+    }
+
+    /**
+     * @param sources Source of randomness.
+     * @param length  the length
+     * @param bh      Data sink.
+     */
+    @Benchmark
+    public void runRadixStringSamplerBase64(Sources sources, StringLength length, Blackhole bh) {
+        final UniformRandomProvider r = sources.getGenerator();
+        final int len = length.length;
+        final RadixStringSampler s = new RadixStringSampler(r, len, 64);
+        runSample(s::sample, bh);
+    }
+
+    /**
+     * @param sources Source of randomness.
+     * @param length  the length
+     * @param bh      Data sink.
+     */
+    // May be slower than runRadixStringSampler due to creating the char[] each time
     @Benchmark
     public void runRadixStringSampler_nextBase64String(Sources sources, StringLength length, Blackhole bh) {
         final UniformRandomProvider r = sources.getGenerator();
@@ -186,11 +212,93 @@ public class Base64StringSamplerBenchmark {
      * @param bh      Data sink.
      */
     @Benchmark
-    public void runNextBase64ArrayNewString(Sources sources, StringLength length, Blackhole bh) {
+    public void runBase64ArrayThenNewAsciiString(Sources sources, StringLength length, Blackhole bh) {
         final UniformRandomProvider r = sources.getGenerator();
         final int len = length.length;
-        runSample(() -> nextBase64ArrayNewString(r, len), bh);
+        runSample(getBase64ArrayThenNewAsciiString(r, len), bh);
     }
+
+    /**
+     * @param sources Source of randomness.
+     * @param length  the length
+     * @param bh      Data sink.
+     */
+    @Benchmark
+    public void runBase64StringUsing30of32(Sources sources, StringLength length, Blackhole bh) {
+        final UniformRandomProvider r = sources.getGenerator();
+        final int len = length.length;
+        runSample(getBase64StringUsing30of32(r, len), bh);
+    }
+
+    /**
+     * @param sources Source of randomness.
+     * @param length  the length
+     * @param bh      Data sink.
+     */
+    @Benchmark
+    public void runAsciiStringSampler(Sources sources, StringLength length, Blackhole bh) {
+        final UniformRandomProvider r = sources.getGenerator();
+        final int len = length.length;
+        final AsciiStringSampler s = new AsciiStringSampler(r);
+        runSample(() -> s.nextBase64(len), bh);
+    }
+
+    /**
+     * @param sources Source of randomness.
+     * @param length  the length
+     * @param bh      Data sink.
+     */
+    // This is slow due to the conversion of the char to and then from an int code
+    // point for validation
+    // @Benchmark
+    public void runRandomStringGeneratorWithCharArray(Sources sources, StringLength length, Blackhole bh) {
+        final UniformRandomProvider r = sources.getGenerator();
+        final int len = length.length;
+        final RandomStringGenerator rss = new RandomStringGenerator.Builder().usingRandom(r::nextInt).selectFrom(chars)
+                .build();
+        runSample(() -> rss.generate(len), bh);
+    }
+
+    /**
+     * @param sources Source of randomness.
+     * @param length  the length
+     * @param bh      Data sink.
+     */
+    // This is slow since it does Character.charCount (which will always be 1 for
+    // base64
+    // and then checks flags that are set to false (so negating the check). It also
+    // check input args for edge cases this call does not hit.
+    // @Benchmark
+    public void runRandomStringUtilsWithCharArray(Sources sources, StringLength length, Blackhole bh) {
+        final UniformRandomProvider r = sources.getGenerator();
+        final int len = length.length;
+        final Random random = new Random() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public int nextInt(int max) {
+                return r.nextInt(max);
+            }
+        };
+        runSample(() -> RandomStringUtils.random(len, 0, 0, false, false, chars, random), bh);
+    }
+
+    /**
+     * @param sources Source of randomness.
+     * @param length  the length
+     * @param bh      Data sink.
+     */
+    // This is slow due to supporting generic base N encoding and string line length
+    // wrapping.
+    // It is surprising how slow it is ...
+    @Benchmark
+    public void runNextBytesAndBase64Encode(Sources sources, StringLength length, Blackhole bh) {
+        final UniformRandomProvider r = sources.getGenerator();
+        final int len = length.length;
+        runSample(getNextBytesAndBase64Encode(r, len), bh);
+    }
+
+    // Methods to generate strings. These are package level to allow JUnit tests.
 
     /**
      * This array is a lookup table that translates 6-bit positive integer index
@@ -219,15 +327,16 @@ public class Base64StringSamplerBenchmark {
      *
      * @param rng    Generator of uniformly distributed random numbers.
      * @param length The length.
-     * @return A random Base64 string.
+     * @return A random Base64 string supplier.
      * @throws NegativeArraySizeException If length is negative
      * @see <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>
      */
-    private static String nextBase64ArrayNewString(UniformRandomProvider rng, int length) throws NegativeArraySizeException {
+    static Supplier<String> getBase64ArrayThenNewAsciiString(UniformRandomProvider rng, int length)
+            throws NegativeArraySizeException {
 
         // -----
         // NOTE:
-        // This method is as RadixStringSampler_nextBase64String but creates a byte 
+        // This method is as RadixStringSampler_nextBase64String but creates a byte
         // array for encoding.
         // Since the String(char[]) constructor will copy the char[] array
         // this means that this method has the overhead of creating an
@@ -239,130 +348,143 @@ public class Base64StringSamplerBenchmark {
         // for each base64 character.
         // There are 16 samples per 3 ints (16 * 6 = 3 * 32 = 96 bits).
         final byte[] out = new byte[length];
-        // Run the loop without checking index i by producing characters
-        // up to the size below the desired length.
-        int i = 0;
-        for (int loopLimit = length / 16; loopLimit-- > 0;) {
-            final int i1 = rng.nextInt();
-            final int i2 = rng.nextInt();
-            final int i3 = rng.nextInt();
-            // 0x3F == 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20
-            // Extract 4 6-bit samples from the first 24 bits of each int
-            out[i++] = BTABLE64[(i1 >>> 18) & 0x3F];
-            out[i++] = BTABLE64[(i1 >>> 12) & 0x3F];
-            out[i++] = BTABLE64[(i1 >>> 6) & 0x3F];
-            out[i++] = BTABLE64[i1 & 0x3F];
-            out[i++] = BTABLE64[(i2 >>> 18) & 0x3F];
-            out[i++] = BTABLE64[(i2 >>> 12) & 0x3F];
-            out[i++] = BTABLE64[(i2 >>> 6) & 0x3F];
-            out[i++] = BTABLE64[i2 & 0x3F];
-            out[i++] = BTABLE64[(i3 >>> 18) & 0x3F];
-            out[i++] = BTABLE64[(i3 >>> 12) & 0x3F];
-            out[i++] = BTABLE64[(i3 >>> 6) & 0x3F];
-            out[i++] = BTABLE64[i3 & 0x3F];
-            // Combine the remaining 8-bits from each int
-            // to get 4 more samples
-            final int i4 = (i1 >>> 24) | ((i2 >>> 24) << 8) | ((i3 >>> 24) << 16);
-            out[i++] = BTABLE64[(i4 >>> 18) & 0x3F];
-            out[i++] = BTABLE64[(i4 >>> 12) & 0x3F];
-            out[i++] = BTABLE64[(i4 >>> 6) & 0x3F];
-            out[i++] = BTABLE64[i4 & 0x3F];
-        }
-        // The final characters
-        if (i < length) {
-            // For simplicity there are 5 samples per int (with two unused bits).
-            while (i < length) {
-                int b = rng.nextInt();
-                out[i++] = BTABLE64[b & 0x3F];
-                for (int j = 0; j < 4 && i < length; j++) {
-                    b >>>= 6;
+        return () -> {
+            // Run the loop without checking index i by producing characters
+            // up to the size below the desired length.
+            int i = 0;
+            for (int loopLimit = length / 16; loopLimit-- > 0;) {
+                final int i1 = rng.nextInt();
+                final int i2 = rng.nextInt();
+                final int i3 = rng.nextInt();
+                // 0x3F == 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20
+                // Extract 4 6-bit samples from the first 24 bits of each int
+                out[i++] = BTABLE64[(i1 >>> 18) & 0x3F];
+                out[i++] = BTABLE64[(i1 >>> 12) & 0x3F];
+                out[i++] = BTABLE64[(i1 >>> 6) & 0x3F];
+                out[i++] = BTABLE64[i1 & 0x3F];
+                out[i++] = BTABLE64[(i2 >>> 18) & 0x3F];
+                out[i++] = BTABLE64[(i2 >>> 12) & 0x3F];
+                out[i++] = BTABLE64[(i2 >>> 6) & 0x3F];
+                out[i++] = BTABLE64[i2 & 0x3F];
+                out[i++] = BTABLE64[(i3 >>> 18) & 0x3F];
+                out[i++] = BTABLE64[(i3 >>> 12) & 0x3F];
+                out[i++] = BTABLE64[(i3 >>> 6) & 0x3F];
+                out[i++] = BTABLE64[i3 & 0x3F];
+                // Combine the remaining 8-bits from each int
+                // to get 4 more samples
+                final int i4 = (i1 >>> 24) | ((i2 >>> 24) << 8) | ((i3 >>> 24) << 16);
+                out[i++] = BTABLE64[(i4 >>> 18) & 0x3F];
+                out[i++] = BTABLE64[(i4 >>> 12) & 0x3F];
+                out[i++] = BTABLE64[(i4 >>> 6) & 0x3F];
+                out[i++] = BTABLE64[i4 & 0x3F];
+            }
+            // The final characters
+            if (i < length) {
+                // For simplicity there are 5 samples per int (with two unused bits).
+                while (i < length) {
+                    int b = rng.nextInt();
                     out[i++] = BTABLE64[b & 0x3F];
+                    for (int j = 0; j < 4 && i < length; j++) {
+                        b >>>= 6;
+                        out[i++] = BTABLE64[b & 0x3F];
+                    }
                 }
             }
-        }
-        return new String(out, 0, length, StandardCharsets.US_ASCII);
-    }
-    
-    /**
-     * @param sources Source of randomness.
-     * @param length  the length
-     * @param bh      Data sink.
-     */
-    @Benchmark
-    public void runRadixStringSampler(Sources sources, StringLength length, Blackhole bh) {
-        final UniformRandomProvider r = sources.getGenerator();
-        final int len = length.length;
-        final RadixStringSampler s = new RadixStringSampler(r, len, 64);
-        runSample(() -> s.sample(), bh);
-    }
-
-    /**
-     * @param sources Source of randomness.
-     * @param length  the length
-     * @param bh      Data sink.
-     */
-    @Benchmark
-    public void runAsciiStringSampler(Sources sources, StringLength length, Blackhole bh) {
-        final UniformRandomProvider r = sources.getGenerator();
-        final int len = length.length;
-        final AsciiStringSampler s = new AsciiStringSampler(r);
-        runSample(() -> s.nextBase64(len), bh);
-    }
-
-    /**
-     * @param sources Source of randomness.
-     * @param length  the length
-     * @param bh      Data sink.
-     */
-    @Benchmark
-    public void runRandomStringGeneratorWithCharArray(Sources sources, StringLength length, Blackhole bh) {
-        final UniformRandomProvider r = sources.getGenerator();
-        final int len = length.length;
-        final RandomStringGenerator rss = new RandomStringGenerator.Builder().usingRandom(r::nextInt)
-                .selectFrom(chars).build();
-        runSample(() -> rss.generate(len), bh);
-    }
-
-    /**
-     * @param sources Source of randomness.
-     * @param length  the length
-     * @param bh      Data sink.
-     */
-    @Benchmark
-    public void runRandomStringUtilsWithCharArray(Sources sources, StringLength length, Blackhole bh) {
-        final UniformRandomProvider r = sources.getGenerator();
-        final int len = length.length;
-        final Random random = new Random() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public int nextInt(int max) {
-                return r.nextInt(max);
-            }
+            return new String(out, 0, length, StandardCharsets.US_ASCII);
         };
-        runSample(() -> RandomStringUtils.random(len, 0, 0, false, false, chars, random), bh);
     }
 
     /**
-     * @param sources Source of randomness.
-     * @param length  the length
-     * @param bh      Data sink.
+     * This array is a lookup table that translates 6-bit positive integer index
+     * values into their "Base64 Alphabet" equivalents as specified in Table 1 of
+     * RFC 2045.
+     *
+     * Taken from org.apache.commons.codec.binary.Base64.
      */
-    @Benchmark
-    public void runNextBytesAndBase64Encode(Sources sources, StringLength length, Blackhole bh) {
-        final UniformRandomProvider r = sources.getGenerator();
-        final int len = length.length;
+    //@formatter:off
+    private static final char[] TABLE64 = {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
+    };
+    //@formatter:on  
+
+    /**
+     * Generate a random Base64 string of the given length.
+     * <p>
+     * The string uses MIME's Base64 table (A-Z, a-z, 0-9, +, /).
+     * <p>
+     * Performs sub-optimal sampling of nextInt() using only 30 of the 32 bits for 5
+     * 6-bit samples per integer.
+     *
+     * @param rng    Generator of uniformly distributed random numbers.
+     * @param length The length.
+     * @return A random Base64 string supplier.
+     * @throws NegativeArraySizeException If length is negative
+     * @see <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>
+     */
+    static Supplier<String> getBase64StringUsing30of32(UniformRandomProvider rng, int length)
+            throws NegativeArraySizeException {
+
+        // Process blocks of 6 bits as an index in the range 0-63
+        // for each base64 character.
+        // For simplicity there are 5 samples per int (with two unused bits).
+        final char[] out = new char[length];
+        return () -> {
+            // Run the loop without checking index i by producing characters
+            // up to the size below the desired length.
+            int i = 0;
+            for (int loopLimit = length / 5; loopLimit-- > 0;) {
+                final int i1 = rng.nextInt();
+                // 0x3F == 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20
+                // Extract 5 6-bit samples from the first 30 bits of each int
+                out[i++] = TABLE64[(i1 >>> 24) & 0x3F];
+                out[i++] = TABLE64[(i1 >>> 18) & 0x3F];
+                out[i++] = TABLE64[(i1 >>> 12) & 0x3F];
+                out[i++] = TABLE64[(i1 >>> 6) & 0x3F];
+                out[i++] = TABLE64[i1 & 0x3F];
+            }
+            // The final characters
+            if (i < length) {
+                // For simplicity there are 5 samples per int (with two unused bits).
+                while (i < length) {
+                    int b = rng.nextInt();
+                    out[i++] = TABLE64[b & 0x3F];
+                    for (int j = 0; j < 4 && i < length; j++) {
+                        b >>>= 6;
+                        out[i++] = TABLE64[b & 0x3F];
+                    }
+                }
+            }
+            return new String(out);
+        };
+    }
+
+    /**
+     * Create a base 64 encoded string using
+     * {@link UniformRandomProvider#nextBytes(byte[]) } and
+     * {@link Base64#encode(byte[], int, int)}.
+     *
+     * @param rng    Generator of uniformly distributed random numbers.
+     * @param length The length.
+     * @return A random Base64 string supplier.
+     */
+    static Supplier<String> getNextBytesAndBase64Encode(UniformRandomProvider rng, int length) {
         // 3 bytes to 4 letters
-        final byte[] bytes = new byte[3 * (int) Math.ceil(len / 4.0)];
+        final byte[] bytes = new byte[3 * (int) Math.ceil(length / 4.0)];
+        final int lineLength = 0;
+        final byte[] lineSeparator = null;
         final boolean urlSafe = false;
-        final Base64 b64 = new Base64(urlSafe);
-        runSample(() -> {
-            r.nextBytes(bytes);
+        final Base64 b64 = new Base64(lineLength, lineSeparator, urlSafe);
+        return () -> {
+            rng.nextBytes(bytes);
             byte[] c = b64.encode(bytes, 0, bytes.length);
-            if (c.length > len) {
-                c = Arrays.copyOf(c, len);
+            if (c.length > length) {
+                c = Arrays.copyOf(c, length);
             }
             return new String(c, StandardCharsets.US_ASCII);
-        }, bh);
+        };
     }
 }

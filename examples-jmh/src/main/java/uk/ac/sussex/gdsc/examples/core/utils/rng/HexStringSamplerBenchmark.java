@@ -28,7 +28,6 @@ import java.util.function.Supplier;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.rng.RandomProviderState;
 import org.apache.commons.rng.RestorableUniformRandomProvider;
 import org.apache.commons.rng.UniformRandomProvider;
@@ -142,7 +141,7 @@ public class HexStringSamplerBenchmark {
     public static class StringLength {
         @Param({
                 // "1", "2", "4", "8", "16", "32"
-                //"32", 
+                // "32",
                 "1024" })
         private int length;
 
@@ -176,13 +175,26 @@ public class HexStringSamplerBenchmark {
      * @param bh      Data sink.
      */
     @Benchmark
-    public void runRadixStringSampler(Sources sources, StringLength length, Blackhole bh) {
+    public void runRadixStringSamplerHex(Sources sources, StringLength length, Blackhole bh) {
         final UniformRandomProvider r = sources.getGenerator();
         final int len = length.length;
         final RadixStringSampler s = new RadixStringSampler(r, len, 16);
-        runSample(() -> s.sample(), bh);
+        runSample(s::sample, bh);
     }
-    
+
+    /**
+     * @param sources Source of randomness.
+     * @param length  the length
+     * @param bh      Data sink.
+     */
+    // May be slower than runRadixStringSampler due to creating the char[] each time
+    @Benchmark
+    public void runRadixStringSampler_nextHexString(Sources sources, StringLength length, Blackhole bh) {
+        final UniformRandomProvider r = sources.getGenerator();
+        final int len = length.length;
+        runSample(() -> RadixStringSampler.nextHexString(r, len), bh);
+    }
+
     /**
      * @param sources Source of randomness.
      * @param length  the length
@@ -205,49 +217,7 @@ public class HexStringSamplerBenchmark {
     public void runRandomDataGenerator_nextHexStringModified(Sources sources, StringLength length, Blackhole bh) {
         final UniformRandomProvider r = sources.getGenerator();
         final int len = length.length;
-        runSample(() -> nextHexStringModified(r, len), bh);
-    }
-
-    /**
-     * Adapted from RandomDataGenerator to match the implementation of the
-     * HexStringSampler. Original code is left commented out.
-     *
-     * @param ran a random number generator
-     * @param len the desired string length.
-     * @return the random string.
-     * @throws NotStrictlyPositiveException if {@code len <= 0}.
-     */
-    private static String nextHexStringModified(UniformRandomProvider ran, int len) {
-
-        // Initialize output buffer
-        StringBuilder outBuffer = new StringBuilder();
-
-        // Get int(len/2)+1 random bytes
-        // byte[] randomBytes = new byte[(len/2) + 1]; // ORIGINAL
-        byte[] randomBytes = new byte[(len + 1) / 2];
-        ran.nextBytes(randomBytes);
-
-        // Convert each byte to 2 hex digits
-        for (int i = 0; i < randomBytes.length; i++) {
-
-            /*
-             * Add 128 to byte value to make interval 0-255 before doing hex conversion.
-             * This guarantees <= 2 hex digits from toHexString() toHexString would
-             * otherwise add 2^32 to negative arguments.
-             */
-            // ORIGINAL
-            // Integer c = Integer.valueOf(randomBytes[i]);
-            // String hex = Integer.toHexString(c.intValue() + 128);
-
-            String hex = Integer.toHexString(randomBytes[i] & 0xff);
-
-            // Make sure we add 2 hex digits for each byte
-            if (hex.length() == 1) {
-                outBuffer.append('0');
-            }
-            outBuffer.append(hex);
-        }
-        return outBuffer.toString().substring(0, len);
+        runSample(getNextHexStringModified(r, len), bh);
     }
 
     /**
@@ -259,44 +229,7 @@ public class HexStringSamplerBenchmark {
     public void runRandomDataGenerator_nextHexStringOriginal(Sources sources, StringLength length, Blackhole bh) {
         final UniformRandomProvider r = sources.getGenerator();
         final int len = length.length;
-        runSample(() -> nextHexStringOriginal(r, len), bh);
-    }
-
-    /**
-     * Adapted from RandomDataGenerator to use a UniformRandomProvider.
-     *
-     * @param ran a random number generator
-     * @param len the desired string length.
-     * @return the random string.
-     * @throws NotStrictlyPositiveException if {@code len <= 0}.
-     */
-    private static String nextHexStringOriginal(UniformRandomProvider ran, int len) {
-
-        // Initialize output buffer
-        StringBuilder outBuffer = new StringBuilder();
-
-        // Get int(len/2)+1 random bytes
-        byte[] randomBytes = new byte[(len / 2) + 1];
-        ran.nextBytes(randomBytes);
-
-        // Convert each byte to 2 hex digits
-        for (int i = 0; i < randomBytes.length; i++) {
-            Integer c = Integer.valueOf(randomBytes[i]);
-
-            /*
-             * Add 128 to byte value to make interval 0-255 before doing hex conversion.
-             * This guarantees <= 2 hex digits from toHexString() toHexString would
-             * otherwise add 2^32 to negative arguments.
-             */
-            String hex = Integer.toHexString(c.intValue() + 128);
-
-            // Make sure we add 2 hex digits for each byte
-            if (hex.length() == 1) {
-                hex = "0" + hex;
-            }
-            outBuffer.append(hex);
-        }
-        return outBuffer.toString().substring(0, len);
+        runSample(getNextHexStringOriginal(r, len), bh);
     }
 
     /**
@@ -378,15 +311,112 @@ public class HexStringSamplerBenchmark {
     public void runNextBytesAndHexEncodeHex(Sources sources, StringLength length, Blackhole bh) {
         final UniformRandomProvider r = sources.getGenerator();
         final int len = length.length;
+        runSample(getNextBytesHexEncode(r, len), bh);
+    }
+
+    // Methods to generate strings. These are package level to allow JUnit tests.
+
+    /**
+     * Adapted from RandomDataGenerator to match the implementation of the
+     * HexStringSampler. Original code is left commented out.
+     *
+     * @param rng    Generator of uniformly distributed random numbers.
+     * @param length The length.
+     * @return the random string.
+     */
+    static Supplier<String> getNextHexStringModified(UniformRandomProvider rng, int length) {
+
+        // Get int(len/2)+1 random bytes
+        // byte[] randomBytes = new byte[(len/2) + 1]; // ORIGINAL
+        byte[] randomBytes = new byte[(length + 1) / 2];
+        // Initialize output buffer
+        StringBuilder outBuffer = new StringBuilder(length);
+
+        return () -> {
+            outBuffer.setLength(0);
+            rng.nextBytes(randomBytes);
+
+            // Convert each byte to 2 hex digits
+            for (int i = 0; i < randomBytes.length; i++) {
+
+                /*
+                 * Add 128 to byte value to make interval 0-255 before doing hex conversion.
+                 * This guarantees <= 2 hex digits from toHexString() toHexString would
+                 * otherwise add 2^32 to negative arguments.
+                 */
+                // ORIGINAL
+                // Integer c = Integer.valueOf(randomBytes[i]);
+                // String hex = Integer.toHexString(c.intValue() + 128);
+
+                String hex = Integer.toHexString(randomBytes[i] & 0xff);
+
+                // Make sure we add 2 hex digits for each byte
+                if (hex.length() == 1) {
+                    outBuffer.append('0');
+                }
+                outBuffer.append(hex);
+            }
+            return outBuffer.toString().substring(0, length);
+        };
+    }
+
+    /**
+     * Adapted from RandomDataGenerator to use a UniformRandomProvider.
+     *
+     * @param rng    a random number generator
+     * @param length the desired string length.
+     * @return the random string.
+     */
+    static Supplier<String> getNextHexStringOriginal(UniformRandomProvider rng, int length) {
+
+        // Get int(len/2)+1 random bytes
+        byte[] randomBytes = new byte[(length / 2) + 1];
+        // Initialize output buffer
+        StringBuilder outBuffer = new StringBuilder(length);
+
+        return () -> {
+            outBuffer.setLength(0);
+            rng.nextBytes(randomBytes);
+
+            // Convert each byte to 2 hex digits
+            for (int i = 0; i < randomBytes.length; i++) {
+                Integer c = Integer.valueOf(randomBytes[i]);
+
+                /*
+                 * Add 128 to byte value to make interval 0-255 before doing hex conversion.
+                 * This guarantees <= 2 hex digits from toHexString() toHexString would
+                 * otherwise add 2^32 to negative arguments.
+                 */
+                String hex = Integer.toHexString(c.intValue() + 128);
+
+                // Make sure we add 2 hex digits for each byte
+                if (hex.length() == 1) {
+                    hex = "0" + hex;
+                }
+                outBuffer.append(hex);
+            }
+            return outBuffer.toString().substring(0, length);
+        };
+    }
+
+    /**
+     * Create a hex string using {@link UniformRandomProvider#nextBytes(byte[]) }
+     * and {@link Hex#encodeHex(byte[], boolean)}.
+     *
+     * @param ran a random number generator
+     * @param len the desired string length.
+     * @return A hex string supplier.
+     */
+    static Supplier<String> getNextBytesHexEncode(UniformRandomProvider ran, int len) {
         final byte[] bytes = new byte[(len + 1) / 2];
         final boolean crop = len % 2 == 1;
-        runSample(() -> {
-            r.nextBytes(bytes);
+        return () -> {
+            ran.nextBytes(bytes);
             char[] c = Hex.encodeHex(bytes, true);
             if (crop) {
                 c = Arrays.copyOf(c, len);
             }
             return new String(c);
-        }, bh);
+        };
     }
 }
