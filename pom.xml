@@ -239,7 +239,7 @@
   </profiles>
 
   <modules>
-    <module>examples-jmh</module>
+    <module>gdsc-examples-jmh</module>
   </modules>
 
 </project>
