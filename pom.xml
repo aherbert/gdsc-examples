@@ -46,7 +46,7 @@
   </ciManagement>
   <scm>
     <connection>scm:git:git://github.com/aherbert/gdsc-examples.git</connection>
-    <developerConnection>scm:git:ssh://github.com:aherbert/gdsc-examples.git</developerConnection>
+    <developerConnection>scm:git:ssh://github.com/aherbert/gdsc-examples.git</developerConnection>
     <url>https://github.com/aherbert/gdsc-examples</url>
   </scm>
 
