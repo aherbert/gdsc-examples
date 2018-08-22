@@ -36,7 +36,7 @@
     </dependency>
     <dependency>
       <groupId>uk.ac.sussex.gdsc</groupId>
-      <artifactId>gdsc-test</artifactId>
+      <artifactId>gdsc-test-utils</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -155,6 +155,10 @@
                     <argument>-classpath</argument>
                     <classpath />
                     <argument>org.openjdk.jmh.Main</argument>
+                    <!-- increase iterations
+                    <argument>-i</argument>
+                    <argument>20</argument>
+                     -->
                     <argument>-rf</argument>
                     <argument>csv</argument>
                     <argument>-rff</argument>
