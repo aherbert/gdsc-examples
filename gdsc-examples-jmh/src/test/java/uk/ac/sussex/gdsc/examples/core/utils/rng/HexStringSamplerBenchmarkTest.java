@@ -2,7 +2,7 @@
  * #%L
  * Code for running JMH benchmarks to assess performance.
  * %%
- * Copyright (C) 2018 Alex Herbert
+ * Copyright (C) 2018 - 2019 Alex Herbert
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
