@@ -1,15 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.scijava</groupId>
-    <artifactId>pom-scijava</artifactId>
-    <version>22.2.0</version>
-    <relativePath></relativePath>
+    <groupId>uk.ac.sussex.gdsc</groupId>
+    <artifactId>gdsc-ij-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../gdsc-ij-parent</relativePath>
   </parent>
 
-  <groupId>uk.ac.sussex.gdsc</groupId>
   <artifactId>gdsc-examples</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
@@ -31,12 +29,11 @@
   </licenses>
 
   <inceptionYear>2018</inceptionYear>
-  <mailingLists>
-    <mailingList>
-      <name>ImageJ Forum</name>
-      <archive>http://forum.imagej.net/</archive>
-    </mailingList>
-  </mailingLists>
+  <scm>
+    <connection>scm:git:git://github.com/aherbert/gdsc-examples.git</connection>
+    <developerConnection>scm:git:ssh://github.com/aherbert/gdsc-examples.git</developerConnection>
+    <url>https://github.com/aherbert/gdsc-examples</url>
+  </scm>
   <issueManagement>
     <system>GitHub Issues</system>
     <url>https://github.com/aherbert/gdsc-examples/issues</url>
@@ -44,19 +41,18 @@
   <ciManagement>
     <system>None</system>
   </ciManagement>
-  <scm>
-    <connection>scm:git:git://github.com/aherbert/gdsc-examples.git</connection>
-    <developerConnection>scm:git:ssh://github.com/aherbert/gdsc-examples.git</developerConnection>
-    <url>https://github.com/aherbert/gdsc-examples</url>
-  </scm>
+  <mailingLists>
+    <mailingList>
+      <name>ImageJ Forum</name>
+      <archive>http://forum.imagej.net/</archive>
+    </mailingList>
+  </mailingLists>
 
   <developers>
     <developer>
       <id>aherbert</id>
       <name>Alex Herbert</name>
       <email>a.herbert@sussex.ac.uk</email>
-      <organization>GDSC</organization>
-      <organizationUrl>http://www.sussex.ac.uk/gdsc/</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -69,28 +65,14 @@
   </contributors>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
     <license.licenseName>gpl_v3</license.licenseName>
     <license.copyrightOwners>Alex Herbert</license.copyrightOwners>
-    <license.projectName>${project.description}</license.projectName>
-    <!-- Versions -->
-    <org.junit.jupiter.version>5.2.0</org.junit.jupiter.version>
-    <org.junit.platform.version>1.2.0</org.junit.platform.version>
-    <org.junit.version>4.12</org.junit.version>
-    <commons.rng.version>1.1</commons.rng.version>
-    <org.jacoco.verion>0.8.1</org.jacoco.verion>
-    <license-maven-plugin.version>1.16</license-maven-plugin.version>
-    <!-- Maven -->
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
-    <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-    <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
-    <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
-    <maven-gpg-plugin>1.6</maven-gpg-plugin>
-    <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+    <!-- Workaround to avoid duplicating config files. -->
+    <parent.dir>${basedir}</parent.dir>
+    <!-- Dependency versions -->
+    <gdsc.core.version>2.0-SNAPSHOT</gdsc.core.version>
+    <gdsc.version>1.4-SNAPSHOT</gdsc.version>
+    <gdsc.smlm.version>2.0-SNAPSHOT</gdsc.smlm.version>
   </properties>
 
   <dependencyManagement>
@@ -98,23 +80,17 @@
       <dependency>
         <groupId>uk.ac.sussex.gdsc</groupId>
         <artifactId>gdsc-core</artifactId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>${gdsc.core.version}</version>
       </dependency>
       <dependency>
         <groupId>uk.ac.sussex.gdsc</groupId>
-        <artifactId>gdsc-test-utils</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-        <scope>test</scope>
+        <artifactId>gdsc</artifactId>
+        <version>${gdsc.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-rng-sampling</artifactId>
-        <version>${commons.rng.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-api</artifactId>
-        <version>${org.junit.jupiter.version}</version>
+        <groupId>uk.ac.sussex.gdsc</groupId>
+        <artifactId>gdsc-smlm</artifactId>
+        <version>${gdsc.smlm.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -125,7 +101,6 @@
       <plugins>
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>${maven-assembly-plugin}</version>
           <configuration>
             <descriptorRefs>
               <descriptorRef>jar-with-dependencies</descriptorRef>
@@ -139,12 +114,32 @@
             </archive>
           </configuration>
         </plugin>
+        <plugin>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <configuration>
+            <configLocation>${parent.dir}/src/main/resources/checkstyle/checkstyle.xml</configLocation>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <configuration>
+            <rulesets>
+              <ruleset>${parent.dir}/src/main/resources/pmd/pmd-ruleset.xml</ruleset>
+            </rulesets>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-maven-plugin</artifactId>
+          <configuration>
+            <excludeFilterFile>${parent.dir}/src/main/resources/spotbugs/spotbugs-exclude-filter.xml</excludeFilterFile>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
-        <version>${maven-source-plugin.version}</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -156,35 +151,7 @@
         </executions>
       </plugin>
       <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>${maven-surefire-plugin.version}</version>
-        <configuration>
-          <systemPropertyVariables>
-            <!-- Set JUL Formatting -->
-            <java.util.logging.SimpleFormatter.format><![CDATA[%4$-7s %2$s %5$s%6$s%n]]></java.util.logging.SimpleFormatter.format>
-          </systemPropertyVariables>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-surefire-provider</artifactId>
-            <version>${org.junit.platform.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${org.junit.jupiter.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>${org.junit.jupiter.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${maven-javadoc-plugin.version}</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -194,49 +161,9 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>${license-maven-plugin.version}</version>
-        <configuration>
-          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
-          <canUpdateDescription>true</canUpdateDescription>
-          <canUpdateCopyright>true</canUpdateCopyright>
-        </configuration>
-      </plugin>
+
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>eclipse</id>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${org.junit.jupiter.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-launcher</artifactId>
-            <version>${org.junit.platform.version}</version>
-            <scope>test</scope>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
-      <dependencies>
-        <dependency>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter-engine</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.junit.platform</groupId>
-          <artifactId>junit-platform-launcher</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 
   <modules>
     <module>gdsc-examples-jmh</module>
