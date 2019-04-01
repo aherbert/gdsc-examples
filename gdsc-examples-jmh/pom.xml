@@ -160,9 +160,9 @@
                     <argument>org.openjdk.jmh.Main</argument>
                     <!-- increase iterations <argument>-i</argument> <argument>20</argument> -->
                     <argument>-rf</argument>
-                    <argument>csv</argument>
+                    <argument>json</argument>
                     <argument>-rff</argument>
-                    <argument>target/jmh-result.${benchmark}.csv</argument>
+                    <argument>target/jmh-result.${benchmark}.json</argument>
                     <argument>${benchmark}</argument>
                   </arguments>
                 </configuration>
