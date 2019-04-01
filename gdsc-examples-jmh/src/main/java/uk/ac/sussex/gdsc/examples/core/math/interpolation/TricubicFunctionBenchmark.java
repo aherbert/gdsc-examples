@@ -60,9 +60,13 @@ public class TricubicFunctionBenchmark {
   private static final CubicSplinePosition[] x;
   /** Powers for the x position. */
   private static final double[][] powerX;
-  /** Coefficients for the cubic spline. */
+  /** Powers for the x position as float. */
+  private static final float[][] powerXF;
+  /** The cubic spline function using array data. */
   private static final DoubleCustomTricubicFunctionArray[] arrayF;
-  /** Coefficient table for the cubic spline. */
+  /** The cubic spline function using float array data. */
+  private static final FloatCustomTricubicFunctionArray[] arrayFF;
+  /** The cubic spline function using custom object data. */
   private static final DoubleCustomTricubicFunctionData[] dataF;
   /** Power tables. */
   private static final double[][] arrayTables;
@@ -86,6 +90,7 @@ public class TricubicFunctionBenchmark {
     ThreadLocalRandom rng = ThreadLocalRandom.current();
     x = new CubicSplinePosition[NUM_SAMPLES];
     powerX = new double[NUM_SAMPLES][];
+    powerXF = new float[NUM_SAMPLES][];
     arrayTables = new double[NUM_SAMPLES][];
     arrayTables2 = new double[NUM_SAMPLES][];
     arrayTables3 = new double[NUM_SAMPLES][];
@@ -97,6 +102,7 @@ public class TricubicFunctionBenchmark {
     for (int i = 0; i < NUM_SAMPLES; i++) {
       x[i] = new CubicSplinePosition(rng.nextDouble());
       powerX[i] = new double[] {x[i].x1, x[i].x2, x[i].x3};
+      powerXF[i] = SimpleArrayUtils.toFloat(powerX[i]);
       double[] tmp = computePowerTable(powerX[i], powerX[i], powerX[i]);
       arrayTables[i] = tmp;
       arrayTables2[i] = multiply(tmp, 2);
@@ -109,10 +115,12 @@ public class TricubicFunctionBenchmark {
     }
 
     arrayF = new DoubleCustomTricubicFunctionArray[NUM_FUNCTIONS];
+    arrayFF = new FloatCustomTricubicFunctionArray[NUM_FUNCTIONS];
     dataF = new DoubleCustomTricubicFunctionData[NUM_FUNCTIONS];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
       double[] tmp = createCoefficients(rng);
       arrayF[i] = new DoubleCustomTricubicFunctionArray(tmp);
+      arrayFF[i] = new FloatCustomTricubicFunctionArray(SimpleArrayUtils.toFloat(tmp));
       dataF[i] = new DoubleCustomTricubicFunctionData(new DoubleCubicSplineData(tmp));
     }
   }
@@ -244,6 +252,30 @@ public class TricubicFunctionBenchmark {
   }
 
   @Benchmark
+  public void arrayDFValue0(Blackhole bh) {
+    final Sink64 sink = new Sink64();
+    for (int i = 0; i < NUM_FUNCTIONS; i++) {
+      FloatCustomTricubicFunctionArray f = arrayFF[i];
+      for (int j = 0; j < NUM_SAMPLES; j++) {
+        sink.put(f.value0(powerX[j], powerX[j], powerX[j]));
+      }
+    }
+    bh.consume(sink.counter);
+  }
+
+  @Benchmark
+  public void arrayFFValue0(Blackhole bh) {
+    final Sink64 sink = new Sink64();
+    for (int i = 0; i < NUM_FUNCTIONS; i++) {
+      FloatCustomTricubicFunctionArray f = arrayFF[i];
+      for (int j = 0; j < NUM_SAMPLES; j++) {
+        sink.put(f.value0(powerXF[j], powerXF[j], powerXF[j]));
+      }
+    }
+    bh.consume(sink.counter);
+  }
+
+  @Benchmark
   public void dataValue0(Blackhole bh) {
     final Sink64 sink = new Sink64();
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
@@ -255,7 +287,7 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  @Benchmark
+  //@Benchmark
   public void arrayValue1(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
@@ -269,7 +301,7 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  @Benchmark
+  //@Benchmark
   public void dataValue1(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
@@ -283,7 +315,7 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  @Benchmark
+  //@Benchmark
   public void arrayValue2(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
@@ -299,7 +331,7 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  @Benchmark
+  //@Benchmark
   public void dataValue2(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];

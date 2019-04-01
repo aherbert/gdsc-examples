@@ -3,16 +3,16 @@ package uk.ac.sussex.gdsc.examples.core.math.interpolation;
 /**
  * 3D-spline function using double precision float values to store the coefficients.
  */
-public class DoubleCustomTricubicFunctionArray {
+public class FloatCustomTricubicFunctionArray {
   /** The 64 coefficients (coeff) for the tri-cubic function. */
-  private final double[] coeff;
+  private final float[] coeff;
 
   /**
    * Instantiates a new double custom tricubic function.
    *
    * @param coefficients List of spline coefficients.
    */
-  DoubleCustomTricubicFunctionArray(double[] coefficients) {
+  FloatCustomTricubicFunctionArray(float[] coefficients) {
     // Use the table directly
     this.coeff = coefficients;
   }
@@ -41,6 +41,27 @@ public class DoubleCustomTricubicFunctionArray {
   // Allow the working variables for the power computation
   // to be declared at the top of the method
   // CHECKSTYLE.OFF: VariableDeclarationUsageDistance
+
+  protected double value0(final float[] powerX, final float[] powerY, final float[] powerZ) {
+    //@formatter:off
+    return                        (coeff[ 0] + powerX[0] * coeff[ 1] + powerX[1] * coeff[ 2] + powerX[2] * coeff[ 3])
+                    + powerY[0] * (coeff[ 4] + powerX[0] * coeff[ 5] + powerX[1] * coeff[ 6] + powerX[2] * coeff[ 7])
+                    + powerY[1] * (coeff[ 8] + powerX[0] * coeff[ 9] + powerX[1] * coeff[10] + powerX[2] * coeff[11])
+                    + powerY[2] * (coeff[12] + powerX[0] * coeff[13] + powerX[1] * coeff[14] + powerX[2] * coeff[15])
+            + powerZ[0] * (       (coeff[16] + powerX[0] * coeff[17] + powerX[1] * coeff[18] + powerX[2] * coeff[19])
+                    + powerY[0] * (coeff[20] + powerX[0] * coeff[21] + powerX[1] * coeff[22] + powerX[2] * coeff[23])
+                    + powerY[1] * (coeff[24] + powerX[0] * coeff[25] + powerX[1] * coeff[26] + powerX[2] * coeff[27])
+                    + powerY[2] * (coeff[28] + powerX[0] * coeff[29] + powerX[1] * coeff[30] + powerX[2] * coeff[31]))
+            + powerZ[1] * (       (coeff[32] + powerX[0] * coeff[33] + powerX[1] * coeff[34] + powerX[2] * coeff[35])
+                    + powerY[0] * (coeff[36] + powerX[0] * coeff[37] + powerX[1] * coeff[38] + powerX[2] * coeff[39])
+                    + powerY[1] * (coeff[40] + powerX[0] * coeff[41] + powerX[1] * coeff[42] + powerX[2] * coeff[43])
+                    + powerY[2] * (coeff[44] + powerX[0] * coeff[45] + powerX[1] * coeff[46] + powerX[2] * coeff[47]))
+            + powerZ[2] * (       (coeff[48] + powerX[0] * coeff[49] + powerX[1] * coeff[50] + powerX[2] * coeff[51])
+                    + powerY[0] * (coeff[52] + powerX[0] * coeff[53] + powerX[1] * coeff[54] + powerX[2] * coeff[55])
+                    + powerY[1] * (coeff[56] + powerX[0] * coeff[57] + powerX[1] * coeff[58] + powerX[2] * coeff[59])
+                    + powerY[2] * (coeff[60] + powerX[0] * coeff[61] + powerX[1] * coeff[62] + powerX[2] * coeff[63]));
+    //@formatter:on
+  }
 
   protected double value0(final double[] powerX, final double[] powerY, final double[] powerZ) {
     //@formatter:off
