@@ -276,71 +276,25 @@ public class DoubleCustomTricubicFunctionData {
   // CHECKSTYLE.ON: VariableDeclarationUsageDistance
 
   public double value(DoubleCubicSplineData table) {
-    double result = coeff.x0y0z0;
-    result += table.x1y0z0 * coeff.x1y0z0;
-    result += table.x2y0z0 * coeff.x2y0z0;
-    result += table.x3y0z0 * coeff.x3y0z0;
-    result += table.x0y1z0 * (coeff.x0y1z0
-    +table.x1y0z0 * coeff.x1y1z0
-    +table.x2y0z0 * coeff.x2y1z0
-    +table.x3y0z0 * coeff.x3y1z0);
-    result += table.x0y2z0 * (coeff.x0y2z0
-    +table.x1y0z0 * coeff.x1y2z0
-    +table.x2y0z0 * coeff.x2y2z0
-    +table.x3y0z0 * coeff.x3y2z0);
-    result += table.x0y3z0 * (coeff.x0y3z0
-    +table.x1y0z0 * coeff.x1y3z0
-    +table.x2y0z0 * coeff.x2y3z0
-    +table.x3y0z0 * coeff.x3y3z0);
-    result += table.x0y0z1 * (coeff.x0y0z1
-    +table.x1y0z0 * coeff.x1y0z1
-    +table.x2y0z0 * coeff.x2y0z1
-    +table.x3y0z0 * coeff.x3y0z1);
-    result += table.x0y0z1 * table.x0y1z0 * (coeff.x0y1z1
-    +table.x1y0z0 * coeff.x1y1z1
-    +table.x2y0z0 * coeff.x2y1z1
-    +table.x3y0z0 * coeff.x3y1z1);
-    result += table.x0y0z1 * table.x0y2z0 * (coeff.x0y2z1
-    +table.x1y0z0 * coeff.x1y2z1
-    +table.x2y0z0 * coeff.x2y2z1
-    +table.x3y0z0 * coeff.x3y2z1);
-    result += table.x0y0z1 * table.x0y3z0 * (coeff.x0y3z1
-    +table.x1y0z0 * coeff.x1y3z1
-    +table.x2y0z0 * coeff.x2y3z1
-    +table.x3y0z0 * coeff.x3y3z1);
-    result += table.x0y0z2 * (coeff.x0y0z2
-    +table.x1y0z0 * coeff.x1y0z2
-    +table.x2y0z0 * coeff.x2y0z2
-    +table.x3y0z0 * coeff.x3y0z2);
-    result += table.x0y0z2 * table.x0y1z0 * (coeff.x0y1z2
-    +table.x1y0z0 * coeff.x1y1z2
-    +table.x2y0z0 * coeff.x2y1z2
-    +table.x3y0z0 * coeff.x3y1z2);
-    result += table.x0y0z2 * table.x0y2z0 * (coeff.x0y2z2
-    +table.x1y0z0 * coeff.x1y2z2
-    +table.x2y0z0 * coeff.x2y2z2
-    +table.x3y0z0 * coeff.x3y2z2);
-    result += table.x0y0z2 * table.x0y3z0 * (coeff.x0y3z2
-    +table.x1y0z0 * coeff.x1y3z2
-    +table.x2y0z0 * coeff.x2y3z2
-    +table.x3y0z0 * coeff.x3y3z2);
-    result += table.x0y0z3 * (coeff.x0y0z3
-    +table.x1y0z0 * coeff.x1y0z3
-    +table.x2y0z0 * coeff.x2y0z3
-    +table.x3y0z0 * coeff.x3y0z3);
-    result += table.x0y0z3 * table.x0y1z0 * (coeff.x0y1z3
-    +table.x1y0z0 * coeff.x1y1z3
-    +table.x2y0z0 * coeff.x2y1z3
-    +table.x3y0z0 * coeff.x3y1z3);
-    result += table.x0y0z3 * table.x0y2z0 * (coeff.x0y2z3
-    +table.x1y0z0 * coeff.x1y2z3
-    +table.x2y0z0 * coeff.x2y2z3
-    +table.x3y0z0 * coeff.x3y2z3);
-    result += table.x0y0z3 * table.x0y3z0 * (coeff.x0y3z3
-    +table.x1y0z0 * coeff.x1y3z3
-    +table.x2y0z0 * coeff.x2y3z3
-    +table.x3y0z0 * coeff.x3y3z3);
-    return result;
+    return coeff.x0y0z0
+        +  table.x1y0z0 * coeff.x1y0z0
+        +  table.x2y0z0 * coeff.x2y0z0
+        +  table.x3y0z0 * coeff.x3y0z0
+        +  table.x0y1z0 * (coeff.x0y1z0 + table.x1y0z0 * coeff.x1y1z0 + table.x2y0z0 * coeff.x2y1z0 + table.x3y0z0 * coeff.x3y1z0)
+        +  table.x0y2z0 * (coeff.x0y2z0 + table.x1y0z0 * coeff.x1y2z0 + table.x2y0z0 * coeff.x2y2z0 + table.x3y0z0 * coeff.x3y2z0)
+        +  table.x0y3z0 * (coeff.x0y3z0 + table.x1y0z0 * coeff.x1y3z0 + table.x2y0z0 * coeff.x2y3z0 + table.x3y0z0 * coeff.x3y3z0)
+        +  table.x0y0z1 * (coeff.x0y0z1 + table.x1y0z0 * coeff.x1y0z1 + table.x2y0z0 * coeff.x2y0z1 + table.x3y0z0 * coeff.x3y0z1)
+        +  table.x0y1z1 * (coeff.x0y1z1 + table.x1y0z0 * coeff.x1y1z1 + table.x2y0z0 * coeff.x2y1z1 + table.x3y0z0 * coeff.x3y1z1)
+        +  table.x0y2z1 * (coeff.x0y2z1 + table.x1y0z0 * coeff.x1y2z1 + table.x2y0z0 * coeff.x2y2z1 + table.x3y0z0 * coeff.x3y2z1)
+        +  table.x0y3z1 * (coeff.x0y3z1 + table.x1y0z0 * coeff.x1y3z1 + table.x2y0z0 * coeff.x2y3z1 + table.x3y0z0 * coeff.x3y3z1)
+        +  table.x0y0z2 * (coeff.x0y0z2 + table.x1y0z0 * coeff.x1y0z2 + table.x2y0z0 * coeff.x2y0z2 + table.x3y0z0 * coeff.x3y0z2)
+        +  table.x0y1z2 * (coeff.x0y1z2 + table.x1y0z0 * coeff.x1y1z2 + table.x2y0z0 * coeff.x2y1z2 + table.x3y0z0 * coeff.x3y1z2)
+        +  table.x0y2z2 * (coeff.x0y2z2 + table.x1y0z0 * coeff.x1y2z2 + table.x2y0z0 * coeff.x2y2z2 + table.x3y0z0 * coeff.x3y2z2)
+        +  table.x0y3z2 * (coeff.x0y3z2 + table.x1y0z0 * coeff.x1y3z2 + table.x2y0z0 * coeff.x2y3z2 + table.x3y0z0 * coeff.x3y3z2)
+        +  table.x0y0z3 * (coeff.x0y0z3 + table.x1y0z0 * coeff.x1y0z3 + table.x2y0z0 * coeff.x2y0z3 + table.x3y0z0 * coeff.x3y0z3)
+        +  table.x0y1z3 * (coeff.x0y1z3 + table.x1y0z0 * coeff.x1y1z3 + table.x2y0z0 * coeff.x2y1z3 + table.x3y0z0 * coeff.x3y1z3)
+        +  table.x0y2z3 * (coeff.x0y2z3 + table.x1y0z0 * coeff.x1y2z3 + table.x2y0z0 * coeff.x2y2z3 + table.x3y0z0 * coeff.x3y2z3)
+        +  table.x0y3z3 * (coeff.x0y3z3 + table.x1y0z0 * coeff.x1y3z3 + table.x2y0z0 * coeff.x2y3z3 + table.x3y0z0 * coeff.x3y3z3);
   }
 
   public double value(FloatCubicSplineData table) {
