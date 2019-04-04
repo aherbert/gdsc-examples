@@ -44,6 +44,25 @@ public class FloatCustomTricubicFunctionArray {
 
   protected double value0(final float[] powerX, final float[] powerY, final float[] powerZ) {
     //@formatter:off
+//    // Force double precision summation
+//    double result = 0;
+//    result +=                       (coeff[ 0] + powerX[0] * coeff[ 1] + powerX[1] * coeff[ 2] + powerX[2] * coeff[ 3]);
+//              result += powerY[0] * (coeff[ 4] + powerX[0] * coeff[ 5] + powerX[1] * coeff[ 6] + powerX[2] * coeff[ 7]);
+//              result += powerY[1] * (coeff[ 8] + powerX[0] * coeff[ 9] + powerX[1] * coeff[10] + powerX[2] * coeff[11]);
+//              result += powerY[2] * (coeff[12] + powerX[0] * coeff[13] + powerX[1] * coeff[14] + powerX[2] * coeff[15]);
+//      result += powerZ[0] * (       (coeff[16] + powerX[0] * coeff[17] + powerX[1] * coeff[18] + powerX[2] * coeff[19]));
+//              result += powerY[0] * (coeff[20] + powerX[0] * coeff[21] + powerX[1] * coeff[22] + powerX[2] * coeff[23]);
+//              result += powerY[1] * (coeff[24] + powerX[0] * coeff[25] + powerX[1] * coeff[26] + powerX[2] * coeff[27]);
+//              result += powerY[2] * (coeff[28] + powerX[0] * coeff[29] + powerX[1] * coeff[30] + powerX[2] * coeff[31]);
+//      result += powerZ[1] * (       (coeff[32] + powerX[0] * coeff[33] + powerX[1] * coeff[34] + powerX[2] * coeff[35]));
+//              result += powerY[0] * (coeff[36] + powerX[0] * coeff[37] + powerX[1] * coeff[38] + powerX[2] * coeff[39]);
+//              result += powerY[1] * (coeff[40] + powerX[0] * coeff[41] + powerX[1] * coeff[42] + powerX[2] * coeff[43]);
+//              result += powerY[2] * (coeff[44] + powerX[0] * coeff[45] + powerX[1] * coeff[46] + powerX[2] * coeff[47]);
+//      result += powerZ[2] * (       (coeff[48] + powerX[0] * coeff[49] + powerX[1] * coeff[50] + powerX[2] * coeff[51]));
+//              result += powerY[0] * (coeff[52] + powerX[0] * coeff[53] + powerX[1] * coeff[54] + powerX[2] * coeff[55]);
+//              result += powerY[1] * (coeff[56] + powerX[0] * coeff[57] + powerX[1] * coeff[58] + powerX[2] * coeff[59]);
+//              result += powerY[2] * (coeff[60] + powerX[0] * coeff[61] + powerX[1] * coeff[62] + powerX[2] * coeff[63]);
+//    return result;
     return                        (coeff[ 0] + powerX[0] * coeff[ 1] + powerX[1] * coeff[ 2] + powerX[2] * coeff[ 3])
                     + powerY[0] * (coeff[ 4] + powerX[0] * coeff[ 5] + powerX[1] * coeff[ 6] + powerX[2] * coeff[ 7])
                     + powerY[1] * (coeff[ 8] + powerX[0] * coeff[ 9] + powerX[1] * coeff[10] + powerX[2] * coeff[11])
@@ -140,7 +159,135 @@ public class FloatCustomTricubicFunctionArray {
     //@formatter:on
   }
 
+  protected double value1(final float[] powerX, final float[] powerY, final float[] powerZ,
+      final double[] derivative1) {
+    //@formatter:off
+    derivative1[0] =                          (coeff[ 1] + powerY[0] * coeff[ 5] + powerY[1] * coeff[ 9] + powerY[2] * coeff[13])
+                               +  powerZ[0] * (coeff[17] + powerY[0] * coeff[21] + powerY[1] * coeff[25] + powerY[2] * coeff[29])
+                               +  powerZ[1] * (coeff[33] + powerY[0] * coeff[37] + powerY[1] * coeff[41] + powerY[2] * coeff[45])
+                               +  powerZ[2] * (coeff[49] + powerY[0] * coeff[53] + powerY[1] * coeff[57] + powerY[2] * coeff[61])
+                    + 2 * powerX[0] * (       (coeff[ 2] + powerY[0] * coeff[ 6] + powerY[1] * coeff[10] + powerY[2] * coeff[14])
+                                + powerZ[0] * (coeff[18] + powerY[0] * coeff[22] + powerY[1] * coeff[26] + powerY[2] * coeff[30])
+                                + powerZ[1] * (coeff[34] + powerY[0] * coeff[38] + powerY[1] * coeff[42] + powerY[2] * coeff[46])
+                                + powerZ[2] * (coeff[50] + powerY[0] * coeff[54] + powerY[1] * coeff[58] + powerY[2] * coeff[62]))
+                    + 3 * powerX[1] * (       (coeff[ 3] + powerY[0] * coeff[ 7] + powerY[1] * coeff[11] + powerY[2] * coeff[15])
+                                + powerZ[0] * (coeff[19] + powerY[0] * coeff[23] + powerY[1] * coeff[27] + powerY[2] * coeff[31])
+                                + powerZ[1] * (coeff[35] + powerY[0] * coeff[39] + powerY[1] * coeff[43] + powerY[2] * coeff[47])
+                                + powerZ[2] * (coeff[51] + powerY[0] * coeff[55] + powerY[1] * coeff[59] + powerY[2] * coeff[63]));
+
+    derivative1[1] =                     (coeff[ 4] + powerX[0] * coeff[ 5] + powerX[1] * coeff[ 6] + powerX[2] * coeff[ 7])
+                                + powerZ[0] * (coeff[20] + powerX[0] * coeff[21] + powerX[1] * coeff[22] + powerX[2] * coeff[23])
+                                + powerZ[1] * (coeff[36] + powerX[0] * coeff[37] + powerX[1] * coeff[38] + powerX[2] * coeff[39])
+                                + powerZ[2] * (coeff[52] + powerX[0] * coeff[53] + powerX[1] * coeff[54] + powerX[2] * coeff[55])
+                    + 2 * powerY[0] * (       (coeff[ 8] + powerX[0] * coeff[ 9] + powerX[1] * coeff[10] + powerX[2] * coeff[11])
+                                + powerZ[0] * (coeff[24] + powerX[0] * coeff[25] + powerX[1] * coeff[26] + powerX[2] * coeff[27])
+                                + powerZ[1] * (coeff[40] + powerX[0] * coeff[41] + powerX[1] * coeff[42] + powerX[2] * coeff[43])
+                                + powerZ[2] * (coeff[56] + powerX[0] * coeff[57] + powerX[1] * coeff[58] + powerX[2] * coeff[59]))
+                    + 3 * powerY[1] * (       (coeff[12] + powerX[0] * coeff[13] + powerX[1] * coeff[14] + powerX[2] * coeff[15])
+                                + powerZ[0] * (coeff[28] + powerX[0] * coeff[29] + powerX[1] * coeff[30] + powerX[2] * coeff[31])
+                                + powerZ[1] * (coeff[44] + powerX[0] * coeff[45] + powerX[1] * coeff[46] + powerX[2] * coeff[47])
+                                + powerZ[2] * (coeff[60] + powerX[0] * coeff[61] + powerX[1] * coeff[62] + powerX[2] * coeff[63]));
+
+    // Note: the computation for value0 is arranged using zyx so precompute the factors for z
+    final double factorZ1 =               (coeff[16] + powerX[0] * coeff[17] + powerX[1] * coeff[18] + powerX[2] * coeff[19])
+                            + powerY[0] * (coeff[20] + powerX[0] * coeff[21] + powerX[1] * coeff[22] + powerX[2] * coeff[23])
+                            + powerY[1] * (coeff[24] + powerX[0] * coeff[25] + powerX[1] * coeff[26] + powerX[2] * coeff[27])
+                            + powerY[2] * (coeff[28] + powerX[0] * coeff[29] + powerX[1] * coeff[30] + powerX[2] * coeff[31]);
+    final double factorZ2 =          (coeff[32] + powerX[0] * coeff[33] + powerX[1] * coeff[34] + powerX[2] * coeff[35])
+                            + powerY[0] * (coeff[36] + powerX[0] * coeff[37] + powerX[1] * coeff[38] + powerX[2] * coeff[39])
+                            + powerY[1] * (coeff[40] + powerX[0] * coeff[41] + powerX[1] * coeff[42] + powerX[2] * coeff[43])
+                            + powerY[2] * (coeff[44] + powerX[0] * coeff[45] + powerX[1] * coeff[46] + powerX[2] * coeff[47]);
+    final double factorZ3 =          (coeff[48] + powerX[0] * coeff[49] + powerX[1] * coeff[50] + powerX[2] * coeff[51])
+                            + powerY[0] * (coeff[52] + powerX[0] * coeff[53] + powerX[1] * coeff[54] + powerX[2] * coeff[55])
+                            + powerY[1] * (coeff[56] + powerX[0] * coeff[57] + powerX[1] * coeff[58] + powerX[2] * coeff[59])
+                            + powerY[2] * (coeff[60] + powerX[0] * coeff[61] + powerX[1] * coeff[62] + powerX[2] * coeff[63]);
+    derivative1[2] =                  factorZ1
+                    + 2 * powerZ[0] * factorZ2
+                    + 3 * powerZ[1] * factorZ3;
+
+    return                        (coeff[ 0] + powerX[0] * coeff[ 1] + powerX[1] * coeff[ 2] + powerX[2] * coeff[ 3])
+                    + powerY[0] * (coeff[ 4] + powerX[0] * coeff[ 5] + powerX[1] * coeff[ 6] + powerX[2] * coeff[ 7])
+                    + powerY[1] * (coeff[ 8] + powerX[0] * coeff[ 9] + powerX[1] * coeff[10] + powerX[2] * coeff[11])
+                    + powerY[2] * (coeff[12] + powerX[0] * coeff[13] + powerX[1] * coeff[14] + powerX[2] * coeff[15])
+            + powerZ[0] * factorZ1
+            + powerZ[1] * factorZ2
+            + powerZ[2] * factorZ3;
+    //@formatter:on
+  }
+
   protected double value2(final double[] powerX, final double[] powerY, final double[] powerZ,
+      final double[] derivative1, double[] derivative2) {
+    //@formatter:off
+    // Pre-compute the factors for x
+    final double factorX1 =               (coeff[ 1] + powerY[0] * coeff[ 5] + powerY[1] * coeff[ 9] + powerY[2] * coeff[13])
+                            + powerZ[0] * (coeff[17] + powerY[0] * coeff[21] + powerY[1] * coeff[25] + powerY[2] * coeff[29])
+                            + powerZ[1] * (coeff[33] + powerY[0] * coeff[37] + powerY[1] * coeff[41] + powerY[2] * coeff[45])
+                            + powerZ[2] * (coeff[49] + powerY[0] * coeff[53] + powerY[1] * coeff[57] + powerY[2] * coeff[61]);
+    final double factorX2 =               (coeff[ 2] + powerY[0] * coeff[ 6] + powerY[1] * coeff[10] + powerY[2] * coeff[14])
+                            + powerZ[0] * (coeff[18] + powerY[0] * coeff[22] + powerY[1] * coeff[26] + powerY[2] * coeff[30])
+                            + powerZ[1] * (coeff[34] + powerY[0] * coeff[38] + powerY[1] * coeff[42] + powerY[2] * coeff[46])
+                            + powerZ[2] * (coeff[50] + powerY[0] * coeff[54] + powerY[1] * coeff[58] + powerY[2] * coeff[62]);
+    final double factorX3 =               (coeff[ 3] + powerY[0] * coeff[ 7] + powerY[1] * coeff[11] + powerY[2] * coeff[15])
+                            + powerZ[0] * (coeff[19] + powerY[0] * coeff[23] + powerY[1] * coeff[27] + powerY[2] * coeff[31])
+                            + powerZ[1] * (coeff[35] + powerY[0] * coeff[39] + powerY[1] * coeff[43] + powerY[2] * coeff[47])
+                            + powerZ[2] * (coeff[51] + powerY[0] * coeff[55] + powerY[1] * coeff[59] + powerY[2] * coeff[63]);
+    derivative1[2] =                  factorX1
+                    + 2 * powerX[0] * factorX2
+                    + 3 * powerX[1] * factorX3;
+    derivative2[2] =  2 *             factorX2
+                    + 6 * powerX[0] * factorX3;
+
+    // Pre-compute the factors for y
+    final double factorY1 =               (coeff[ 4] + powerX[0] * coeff[ 5] + powerX[1] * coeff[ 6] + powerX[2] * coeff[ 7])
+                            + powerZ[0] * (coeff[20] + powerX[0] * coeff[21] + powerX[1] * coeff[22] + powerX[2] * coeff[23])
+                            + powerZ[1] * (coeff[36] + powerX[0] * coeff[37] + powerX[1] * coeff[38] + powerX[2] * coeff[39])
+                            + powerZ[2] * (coeff[52] + powerX[0] * coeff[53] + powerX[1] * coeff[54] + powerX[2] * coeff[55]);
+    final double factorY2 =               (coeff[ 8] + powerX[0] * coeff[ 9] + powerX[1] * coeff[10] + powerX[2] * coeff[11])
+                            + powerZ[0] * (coeff[24] + powerX[0] * coeff[25] + powerX[1] * coeff[26] + powerX[2] * coeff[27])
+                            + powerZ[1] * (coeff[40] + powerX[0] * coeff[41] + powerX[1] * coeff[42] + powerX[2] * coeff[43])
+                            + powerZ[2] * (coeff[56] + powerX[0] * coeff[57] + powerX[1] * coeff[58] + powerX[2] * coeff[59]);
+    final double factorY3 =               (coeff[12] + powerX[0] * coeff[13] + powerX[1] * coeff[14] + powerX[2] * coeff[15])
+                            + powerZ[0] * (coeff[28] + powerX[0] * coeff[29] + powerX[1] * coeff[30] + powerX[2] * coeff[31])
+                            + powerZ[1] * (coeff[44] + powerX[0] * coeff[45] + powerX[1] * coeff[46] + powerX[2] * coeff[47])
+                            + powerZ[2] * (coeff[60] + powerX[0] * coeff[61] + powerX[1] * coeff[62] + powerX[2] * coeff[63]);
+    derivative1[2] =                  factorY1
+                    + 2 * powerY[0] * factorY2
+                    + 3 * powerY[1] * factorY3;
+    derivative2[2] =  2 *             factorY2
+                    + 6 * powerY[0] * factorY3;
+
+    // Pre-compute the factors for z
+    final double factorZ1 =               (coeff[16] + powerX[0] * coeff[17] + powerX[1] * coeff[18] + powerX[2] * coeff[19])
+                            + powerY[0] * (coeff[20] + powerX[0] * coeff[21] + powerX[1] * coeff[22] + powerX[2] * coeff[23])
+                            + powerY[1] * (coeff[24] + powerX[0] * coeff[25] + powerX[1] * coeff[26] + powerX[2] * coeff[27])
+                            + powerY[2] * (coeff[28] + powerX[0] * coeff[29] + powerX[1] * coeff[30] + powerX[2] * coeff[31]);
+    final double factorZ2 =               (coeff[32] + powerX[0] * coeff[33] + powerX[1] * coeff[34] + powerX[2] * coeff[35])
+                            + powerY[0] * (coeff[36] + powerX[0] * coeff[37] + powerX[1] * coeff[38] + powerX[2] * coeff[39])
+                            + powerY[1] * (coeff[40] + powerX[0] * coeff[41] + powerX[1] * coeff[42] + powerX[2] * coeff[43])
+                            + powerY[2] * (coeff[44] + powerX[0] * coeff[45] + powerX[1] * coeff[46] + powerX[2] * coeff[47]);
+    final double factorZ3 =               (coeff[48] + powerX[0] * coeff[49] + powerX[1] * coeff[50] + powerX[2] * coeff[51])
+                            + powerY[0] * (coeff[52] + powerX[0] * coeff[53] + powerX[1] * coeff[54] + powerX[2] * coeff[55])
+                            + powerY[1] * (coeff[56] + powerX[0] * coeff[57] + powerX[1] * coeff[58] + powerX[2] * coeff[59])
+                            + powerY[2] * (coeff[60] + powerX[0] * coeff[61] + powerX[1] * coeff[62] + powerX[2] * coeff[63]);
+    derivative1[2] =                  factorZ1
+                    + 2 * powerZ[0] * factorZ2
+                    + 3 * powerZ[1] * factorZ3;
+    derivative2[2] =  2 *             factorZ2
+                    + 6 * powerZ[0] * factorZ3;
+
+    // Note: The computation for value0 is arranged using zyx so reuse the factors for z
+    // and compute the remaining polynomial.
+    return                        (coeff[ 0] + powerX[0] * coeff[ 1] + powerX[1] * coeff[ 2] + powerX[2] * coeff[ 3])
+                    + powerY[0] * (coeff[ 4] + powerX[0] * coeff[ 5] + powerX[1] * coeff[ 6] + powerX[2] * coeff[ 7])
+                    + powerY[1] * (coeff[ 8] + powerX[0] * coeff[ 9] + powerX[1] * coeff[10] + powerX[2] * coeff[11])
+                    + powerY[2] * (coeff[12] + powerX[0] * coeff[13] + powerX[1] * coeff[14] + powerX[2] * coeff[15])
+            + powerZ[0] * factorZ1
+            + powerZ[1] * factorZ2
+            + powerZ[2] * factorZ3;
+    //@formatter:on
+  }
+
+  protected double value2(final float[] powerX, final float[] powerY, final float[] powerZ,
       final double[] derivative1, double[] derivative2) {
     //@formatter:off
     // Pre-compute the factors for x
