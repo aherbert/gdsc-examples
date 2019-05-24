@@ -24,7 +24,7 @@
 
   <properties>
     <!-- Workaround to avoid duplicating config files. -->
-    <parent.dir>${basedir}/..</parent.dir>
+    <gdsc.parent.dir>${basedir}/..</gdsc.parent.dir>
     <jmh.version>1.21</jmh.version>
     <uberjar.name>benchmarks</uberjar.name>
   </properties>
