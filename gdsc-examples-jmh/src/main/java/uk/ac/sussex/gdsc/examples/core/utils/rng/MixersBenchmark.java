@@ -91,7 +91,8 @@ public class MixersBenchmark {
    */
   @State(Scope.Benchmark)
   public static class MixFunction {
-    @Param({"rxsmxs", "rrmxmx", "rrxmrrxmsx0", "murmur3", "stafford13",})
+    @Param({"rxsmxs", "rxsmxsUnmix", "rrmxmx", "rrmxmxUnmix", "rrxmrrxmsx0", "murmur3",
+        "stafford13",})
     private String name;
 
     /** The function. */
@@ -111,8 +112,12 @@ public class MixersBenchmark {
     public void setup() {
       if ("rxsmxs".equals(name)) {
         function = Mixers::rxsmxs;
+      } else if ("rxsmxsUnmix".equals(name)) {
+        function = Mixers::rxsmxsUnmix;
       } else if ("rrmxmx".equals(name)) {
         function = Mixers::rrmxmx;
+      } else if ("rrmxmxUnmix".equals(name)) {
+        function = Mixers::rrmxmxUnmix;
       } else if ("rrxmrrxmsx0".equals(name)) {
         function = Mixers::rrxmrrxmsx0;
       } else if ("murmur3".equals(name)) {
@@ -145,11 +150,12 @@ public class MixersBenchmark {
   public static class UnxorshiftFunction {
     @Param({
         // The unmix function is used in rxsmxsUnmix in the range [5,37]
-        "5", "13", "21", "29", "37",
-        // "1", "2", "4", "8", "16", "32"
-    })
+        // "5", "13", "21", "29", "37",
+        "1", "2", "4", "8", "16", "32"})
     private int shift;
-    @Param({"recursive", "loop"})
+    @Param({
+        // "recursive",
+        "loop", "if", "if2", "if3"})
     private String name;
 
     /** The function. */
@@ -179,13 +185,19 @@ public class MixersBenchmark {
       if ("recursive".equals(name)) {
         function = MixersBenchmark::recursiveUnxorshift;
       } else if ("loop".equals(name)) {
-        function = Mixers::unxorshift;
+        function = MixersBenchmark::loopUnxorshift;
+      } else if ("if".equals(name)) {
+        function = MixersBenchmark::ifUnxorshift;
+      } else if ("if2".equals(name)) {
+        function = MixersBenchmark::if2Unxorshift;
+      } else if ("if3".equals(name)) {
+        function = MixersBenchmark::if3Unxorshift;
       }
     }
   }
 
   /**
-   * Perform an inversion of the remaining lower bits from a right xorshift.
+   * Perform an inversion of the remaining lower bits from a xor right-shift.
    *
    * <pre>
    * value = (x >>> shift) ^ x
@@ -200,7 +212,7 @@ public class MixersBenchmark {
   }
 
   /**
-   * Helper to perform an inversion of the remaining lower bits from a right xorshift.
+   * Helper to perform an inversion of the remaining lower bits from a xor right-shift.
    *
    * <pre>
    * value = (x >>> shift) ^ x
@@ -233,6 +245,136 @@ public class MixersBenchmark {
     return top1 | bottom2;
   }
 
+  /**
+   * Perform an inversion of a xor right-shift.
+   *
+   * <pre>
+   * value = x ^ (x >>> shift)
+   * </pre>
+   *
+   * <p>The shift value is not checked that it is positive. If negative the results are undefined.
+   *
+   * @param value the value
+   * @param shift the shift (must be strictly positive)
+   * @return the inverted value (x)
+   */
+  public static long loopUnxorshift(long value, int shift) {
+    // Single operation if the shift is large
+    if (shift >= 32) {
+      return value ^ (value >>> shift);
+    }
+    if (shift >= 22) {
+      return value ^ (value >>> shift) ^ (value >>> 2 * shift);
+    }
+    if (shift >= 16) {
+      return value ^ (value >>> shift) ^ (value >>> 2 * shift) ^ (value >>> 3 * shift);
+    }
+
+    // Initialise the recovered value. This will have the correct top 2n-bits set.
+    long recovered = value ^ (value >>> shift);
+    for (int bits = 2 * shift; bits < 64; bits *= 2) {
+      recovered = recovered ^ (recovered >>> bits);
+    }
+    return recovered;
+  }
+
+  /**
+   * Perform an inversion of a xor right-shift.
+   *
+   * @param value the value
+   * @param shift the shift (must be strictly positive)
+   * @return the inverted value (x)
+   */
+  public static long ifUnxorshift(long value, int shift) {
+    // Single operation if the shift is large
+    if (shift >= 32) {
+      return value ^ (value >>> shift);
+    }
+    if (shift >= 16) {
+      if (shift >= 22) {
+        return value ^ (value >>> shift) ^ (value >>> 2 * shift);
+      }
+      return value ^ (value >>> shift) ^ (value >>> 2 * shift) ^ (value >>> 3 * shift);
+    }
+
+    // Initialise the recovered value. This will have the correct top 2n-bits set.
+    long recovered = value ^ (value >>> shift);
+    // Use an algorithm that requires the recovered bits to be xor'd in doubling steps.
+    if (shift < 2) {
+      recovered = recovered ^ (recovered >>> (shift <<= 1));
+    }
+    if (shift < 4) {
+      recovered = recovered ^ (recovered >>> (shift <<= 1));
+    }
+    if (shift < 8) {
+      recovered = recovered ^ (recovered >>> (shift <<= 1));
+    }
+    // Shift is under 16. Final 2 steps are always required.
+    recovered = recovered ^ (recovered >>> (shift << 1));
+    recovered = recovered ^ (recovered >>> (shift << 2));
+    return recovered;
+  }
+
+  /**
+   * Perform an inversion of a xor right-shift.
+   *
+   * @param value the value
+   * @param shift the shift (must be strictly positive)
+   * @return the inverted value (x)
+   */
+  public static long if2Unxorshift(long value, int shift) {
+    // Initialise the recovered value. This will have the correct top 2n-bits set.
+    long recovered = value ^ (value >>> shift);
+    // Use an algorithm that requires the recovered bits to be xor'd in doubling steps.
+    if (shift < 32) {
+      recovered = recovered ^ (recovered >>> (shift <<= 1));
+      if (shift < 32) {
+        recovered = recovered ^ (recovered >>> (shift <<= 1));
+        if (shift < 32) {
+          recovered = recovered ^ (recovered >>> (shift <<= 1));
+          if (shift < 32) {
+            recovered = recovered ^ (recovered >>> (shift <<= 1));
+            if (shift < 32) {
+              recovered = recovered ^ (recovered >>> (shift <<= 1));
+            }
+          }
+        }
+      }
+    }
+    return recovered;
+  }
+
+
+  /**
+   * Perform an inversion of a xor right-shift.
+   *
+   * @param value the value
+   * @param shift the shift (must be strictly positive)
+   * @return the inverted value (x)
+   */
+  public static long if3Unxorshift(long value, int shift) {
+    // Initialise the recovered value. This will have the correct top 2n-bits set.
+    long recovered = value ^ (value >>> shift);
+    // Use an algorithm that requires the recovered bits to be xor'd in doubling steps.
+    // Binary search for algorithm.
+    if (shift < 32) {
+      recovered ^= (recovered >>> (shift << 1));
+      if (shift < 16) {
+        recovered ^= (recovered >>> (shift << 2));
+        if (shift < 8) {
+          recovered ^= (recovered >>> (shift << 3));
+          if (shift < 4) {
+            recovered ^= (recovered >>> (shift << 4));
+            if (shift < 2) {
+              recovered ^= (recovered >>> (shift << 5));
+            }
+          }
+        }
+      }
+    }
+    return recovered;
+  }
+
   // Benchmarks methods below.
 
   /**
@@ -258,7 +400,7 @@ public class MixersBenchmark {
    * @param function the function
    * @return the sum
    */
-  // @Benchmark
+  //@Benchmark
   public long unxorshift(Samples samples, UnxorshiftFunction function) {
     long sum = 0;
     for (long value : samples.getSamples()) {
