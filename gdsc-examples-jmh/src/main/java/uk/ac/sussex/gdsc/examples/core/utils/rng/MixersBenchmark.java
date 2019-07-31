@@ -91,8 +91,8 @@ public class MixersBenchmark {
    */
   @State(Scope.Benchmark)
   public static class MixFunction {
-    @Param({"rxsmxs", "rxsmxsUnmix", "rrmxmx", "rrmxmxUnmix", "rrxmrrxmsx0", "murmur3",
-        "stafford13",})
+    @Param({"rxsmxs", "rxsmxsUnmix", "rrmxmx", "rrmxmxUnmix", "rrxmrrxmsx0", "rrxmrrxmsx0b",
+        "murmur3", "stafford13", "pelican"})
     private String name;
 
     /** The function. */
@@ -120,10 +120,14 @@ public class MixersBenchmark {
         function = Mixers::rrmxmxUnmix;
       } else if ("rrxmrrxmsx0".equals(name)) {
         function = Mixers::rrxmrrxmsx0;
+      } else if ("rrxmrrxmsx0b".equals(name)) {
+        function = MixersBenchmark::rrxmrrxmsx0;
       } else if ("murmur3".equals(name)) {
         function = Mixers::murmur3;
       } else if ("stafford13".equals(name)) {
         function = Mixers::stafford13;
+      } else if ("pelican".equals(name)) {
+        function = MixersBenchmark::pelican;
       }
     }
   }
@@ -150,12 +154,11 @@ public class MixersBenchmark {
   public static class UnxorshiftFunction {
     @Param({
         // The unmix function is used in rxsmxsUnmix in the range [5,37]
-        // "5", "13", "21", "29", "37",
-        "1", "2", "4", "8", "16", "32"})
+        "5", "13", "21", "29", "37",
+        // "1", "2", "4", "8", "16", "32"
+    })
     private int shift;
-    @Param({
-        // "recursive",
-        "loop", "if", "if2", "if3"})
+    @Param({"recursive", "loop", "if", "if2", "if3", "if4"})
     private String name;
 
     /** The function. */
@@ -192,8 +195,47 @@ public class MixersBenchmark {
         function = MixersBenchmark::if2Unxorshift;
       } else if ("if3".equals(name)) {
         function = MixersBenchmark::if3Unxorshift;
+      } else if ("if4".equals(name)) {
+        function = MixersBenchmark::if4Unxorshift;
       }
     }
+  }
+
+  /**
+   * Perform the 64-bit R-R-X-M-R-R-X-M-S-X (Rotate: Rotate; Xor; Multiply; Rotate: Rotate; Xor;
+   * Multiply; Shift; Xor) mix function of Pelle Evensen.
+   *
+   * @param x the input value
+   * @return the output value
+   * @see <a
+   *      href="http://mostlymangling.blogspot.com/2019/01/better-stronger-mixer-and-test-procedure.html">
+   *      Better, stronger mixer and a test procedure.</a>
+   */
+  public static long rrxmrrxmsx0(long x) {
+    // Testing the removal of Long.rotateRight
+    // x ^= Long.rotateRight(x, 25) ^ Long.rotateRight(x, 50)
+    x ^= (x >>> 25 | x << 39) ^ (x >>> 50 | x << 14);
+    x *= 0xa24baed4963ee407L;
+    // x ^= Long.rotateRight(x, 24) ^ Long.rotateRight(x, 49)
+    x ^= (x >>> 24 | x << 40) ^ (x >>> 49 | x << 15);
+    x *= 0x9fb21c651e98df25L;
+    return x ^ x >>> 28;
+  }
+
+  /**
+   * Perform the 64-bit mix function of Tommy Ettinger.
+   *
+   * @param x the input value
+   * @return the output value
+   * @see <a
+   *      href="https://github.com/tommyettinger/sarong/blob/master/src/main/java/sarong/PelicanRNG.java">
+   *      PelicanRNG.</a>
+   */
+  public static long pelican(long x) {
+    x = (x ^ (x << 41 | x >>> 23) ^ (x << 17 | x >>> 47) ^ 0xD1B54A32D192ED03L)
+        * 0xAEF17502108EF2D9L;
+    x = (x ^ x >>> 43 ^ x >>> 31 ^ x >>> 23) * 0xDB4F0B9175AE2165L;
+    return (x ^ x >>> 28);
   }
 
   /**
@@ -344,7 +386,6 @@ public class MixersBenchmark {
     return recovered;
   }
 
-
   /**
    * Perform an inversion of a xor right-shift.
    *
@@ -356,7 +397,6 @@ public class MixersBenchmark {
     // Initialise the recovered value. This will have the correct top 2n-bits set.
     long recovered = value ^ (value >>> shift);
     // Use an algorithm that requires the recovered bits to be xor'd in doubling steps.
-    // Binary search for algorithm.
     if (shift < 32) {
       recovered ^= (recovered >>> (shift << 1));
       if (shift < 16) {
@@ -370,6 +410,37 @@ public class MixersBenchmark {
             }
           }
         }
+      }
+    }
+    return recovered;
+  }
+
+  /**
+   * Perform an inversion of a xor right-shift.
+   *
+   * @param value the value
+   * @param shift the shift (must be strictly positive)
+   * @return the inverted value (x)
+   */
+  public static long if4Unxorshift(long value, int shift) {
+    // Initialise the recovered value. This will have the correct top 2n-bits set.
+    long recovered = value ^ (value >>> shift);
+    // Use an algorithm that requires the recovered bits to be xor'd in doubling steps.
+    // Binary search of values [2, 4, 8, 16, 32]
+    if (shift < 8) {
+      recovered ^= (recovered >>> (shift << 1));
+      recovered ^= (recovered >>> (shift << 2));
+      recovered ^= (recovered >>> (shift << 3));
+      if (shift < 4) {
+        recovered ^= (recovered >>> (shift << 4));
+        if (shift < 2) {
+          recovered ^= (recovered >>> (shift << 5));
+        }
+      }
+    } else if (shift < 32) {
+      recovered ^= (recovered >>> (shift << 1));
+      if (shift < 16) {
+        recovered ^= (recovered >>> (shift << 2));
       }
     }
     return recovered;
@@ -400,7 +471,7 @@ public class MixersBenchmark {
    * @param function the function
    * @return the sum
    */
-  //@Benchmark
+  // @Benchmark
   public long unxorshift(Samples samples, UnxorshiftFunction function) {
     long sum = 0;
     for (long value : samples.getSamples()) {
