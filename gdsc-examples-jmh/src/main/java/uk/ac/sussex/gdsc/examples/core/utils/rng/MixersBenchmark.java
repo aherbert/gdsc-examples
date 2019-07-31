@@ -153,12 +153,12 @@ public class MixersBenchmark {
   @State(Scope.Benchmark)
   public static class UnxorshiftFunction {
     @Param({
-        // The unmix function is used in rxsmxsUnmix in the range [5,37]
-        "5", "13", "21", "29", "37",
-        // "1", "2", "4", "8", "16", "32"
-    })
+        // The unxorshift function is used in rxsmxsUnmix in the range [5,37].
+        // So test powers of 2 under the limits of that interval.
+        // "1", "2",
+        "4", "8", "16", "32"})
     private int shift;
-    @Param({"recursive", "loop", "if", "if2", "if3", "if4"})
+    @Param({"recursive", "loop", "while", "if", "if2", "if3", "if4"})
     private String name;
 
     /** The function. */
@@ -189,6 +189,8 @@ public class MixersBenchmark {
         function = MixersBenchmark::recursiveUnxorshift;
       } else if ("loop".equals(name)) {
         function = MixersBenchmark::loopUnxorshift;
+      } else if ("while".equals(name)) {
+        function = MixersBenchmark::whileUnxorshift;
       } else if ("if".equals(name)) {
         function = MixersBenchmark::ifUnxorshift;
       } else if ("if2".equals(name)) {
@@ -290,12 +292,6 @@ public class MixersBenchmark {
   /**
    * Perform an inversion of a xor right-shift.
    *
-   * <pre>
-   * value = x ^ (x >>> shift)
-   * </pre>
-   *
-   * <p>The shift value is not checked that it is positive. If negative the results are undefined.
-   *
    * @param value the value
    * @param shift the shift (must be strictly positive)
    * @return the inverted value (x)
@@ -316,6 +312,24 @@ public class MixersBenchmark {
     long recovered = value ^ (value >>> shift);
     for (int bits = 2 * shift; bits < 64; bits *= 2) {
       recovered = recovered ^ (recovered >>> bits);
+    }
+    return recovered;
+  }
+
+  /**
+   * Perform an inversion of a xor right-shift.
+   *
+   * @param value the value
+   * @param shift the shift (must be strictly positive)
+   * @return the inverted value (x)
+   */
+  public static long whileUnxorshift(long value, int shift) {
+    // See:
+    // https://stackoverflow.com/questions/31521910/simplify-the-inverse-of-z-x-x-y-function/31522122#31522122
+    long recovered = value;
+    while (shift < 64) {
+      recovered ^= (recovered >>> shift);
+      shift <<= 1;
     }
     return recovered;
   }
@@ -471,7 +485,7 @@ public class MixersBenchmark {
    * @param function the function
    * @return the sum
    */
-  // @Benchmark
+  @Benchmark
   public long unxorshift(Samples samples, UnxorshiftFunction function) {
     long sum = 0;
     for (long value : samples.getSamples()) {
