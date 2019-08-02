@@ -57,10 +57,10 @@ public class MixersBenchmark {
   @State(Scope.Benchmark)
   public static class Samples {
     /**
-     * Number of samples to mix.
+     * Number of samples.
      */
     @Param({"1024"})
-    private String size;
+    private int size;
 
     /** The sample values. */
     private long[] values;
@@ -78,9 +78,8 @@ public class MixersBenchmark {
     @Setup
     public void setup() {
       final Random rng = ThreadLocalRandom.current();
-      int count = Integer.parseInt(size);
-      values = new long[count];
-      for (int i = 0; i < count; i++) {
+      values = new long[size];
+      for (int i = 0; i < size; i++) {
         values[i] = rng.nextLong();
       }
     }
