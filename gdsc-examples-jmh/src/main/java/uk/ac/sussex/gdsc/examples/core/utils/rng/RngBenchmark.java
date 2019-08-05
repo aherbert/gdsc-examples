@@ -22,6 +22,7 @@
 
 package uk.ac.sussex.gdsc.examples.core.utils.rng;
 
+import uk.ac.sussex.gdsc.core.utils.rng.MiddleSquareWeylSequence;
 import uk.ac.sussex.gdsc.core.utils.rng.Pcg32;
 import uk.ac.sussex.gdsc.core.utils.rng.SplitMix;
 
@@ -67,7 +68,7 @@ public class RngBenchmark {
    */
   @State(Scope.Benchmark)
   public static class Source {
-    @Param({"xshrs", "xshrr", "mix32", "mix64"})
+    @Param({"xshrs", "xshrr", "mix32", "mix64", "msws"})
     private String name;
 
     /** The random generator. */
@@ -85,7 +86,7 @@ public class RngBenchmark {
     /** Create the samples. */
     @Setup
     public void setup() {
-      Random seed = ThreadLocalRandom.current();
+      final Random seed = ThreadLocalRandom.current();
       if ("xshrs".equals(name)) {
         rng = Pcg32.xshrs(seed.nextLong(), seed.nextLong());
       } else if ("xshrr".equals(name)) {
@@ -94,6 +95,8 @@ public class RngBenchmark {
         rng = SplitMix.new32(seed.nextLong());
       } else if ("mix64".equals(name)) {
         rng = SplitMix.new64(seed.nextLong());
+      } else if ("msws".equals(name)) {
+        rng = MiddleSquareWeylSequence.newInstance(seed.nextLong());
       }
     }
   }
@@ -134,7 +137,7 @@ public class RngBenchmark {
    * @param source Source of randomness.
    * @return the int
    */
-  // @Benchmark
+  @Benchmark
   public int nextInt(Source source) {
     return source.getRng().nextInt();
   }
@@ -250,7 +253,7 @@ public class RngBenchmark {
    * @param source Source of randomness.
    * @return the long
    */
-  @Benchmark
+  // @Benchmark
   @OperationsPerInvocation(65536)
   public long nextLong65536(Source source) {
     long sum = 0;
