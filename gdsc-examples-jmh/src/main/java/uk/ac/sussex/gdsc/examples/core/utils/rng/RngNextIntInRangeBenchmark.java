@@ -58,7 +58,7 @@ import java.util.stream.IntStream;
 @Fork(value = 1, jvmArgs = {"-server", "-Xms128M", "-Xmx128M"})
 public class RngNextIntInRangeBenchmark {
   /** The value of 2^32. */
-  private static long MAX_32 = 1L << 32;
+  private static final long MAX_32 = 1L << 32;
 
   /** The value. Must NOT be final to prevent JVM optimisation! */
   private int intValue;
@@ -80,10 +80,11 @@ public class RngNextIntInRangeBenchmark {
      * and the expected number of iterations before the loop terminates is 2."
      * </pre>
      */
-    @Param({"256", // Even: 1 << 8
-        "257", // Prime number
-        "1073741825", // Worst case: (1 << 30) + 1
-    })
+    @Param({"16", "17", "256", "257", "4096", "4097",
+        // Worst case power-of-2: (1 << 30)
+        "1073741824",
+        // Worst case: (1 << 30) + 1
+        "1073741825",})
     private int upperBound;
 
     /**
@@ -104,7 +105,7 @@ public class RngNextIntInRangeBenchmark {
     /**
      * The size of the data.
      */
-    @Param({"1337"})
+    @Param({"16", "17", "256", "257", "4096", "4097"})
     private int size;
 
     /** The data. */
@@ -133,9 +134,7 @@ public class RngNextIntInRangeBenchmark {
    */
   @State(Scope.Benchmark)
   public static class Source {
-    @Param({
-        // "xshrs", "xshrr", "mix32", "mix64",
-        "splitRng", "split1", "split2", "split3",})
+    @Param({"xshrs", "xshrr", "mix32", "mix64", "splitRng", "split1", "split2", "split3",})
     private String name;
 
     /** The random generator. */
@@ -427,7 +426,7 @@ public class RngNextIntInRangeBenchmark {
    * @param source Source of randomness.
    * @return the shuffle data
    */
-  // @Benchmark
+  @Benchmark
   public int[] shuffle(IntData data, Source source) {
     final int[] array = data.getData();
     RandomUtils.shuffle(array, source.getRng());
@@ -442,7 +441,7 @@ public class RngNextIntInRangeBenchmark {
    * @param source Source of randomness.
    * @return the sum
    */
-  // @Benchmark
+  @Benchmark
   public int pseudoShuffle(IntData data, Source source) {
     int sum = 0;
     for (int i = data.getData().length; i > 1; i--) {
