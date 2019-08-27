@@ -22,6 +22,7 @@
 
 package uk.ac.sussex.gdsc.examples.core.utils.rng;
 
+import uk.ac.sussex.gdsc.core.utils.rng.MiddleSquareWeylSequence;
 import uk.ac.sussex.gdsc.core.utils.rng.Pcg32;
 import uk.ac.sussex.gdsc.core.utils.rng.RandomUtils;
 import uk.ac.sussex.gdsc.core.utils.rng.SplitMix;
@@ -104,8 +105,15 @@ public class RngNextIntInRangeBenchmark {
   public static class IntData {
     /**
      * The size of the data.
+     *
+     * <p>Note: Large arrays may be limited by cache misses during the swap operation.
+     * This will not be a problem for the pseudo-shuffle benchmark.
      */
-    @Param({"16", "17", "256", "257", "4096", "4097"})
+    @Param({//"16", "256", 
+      //"4096",
+      //"16384",
+      "65536"
+      })
     private int size;
 
     /** The data. */
@@ -134,7 +142,10 @@ public class RngNextIntInRangeBenchmark {
    */
   @State(Scope.Benchmark)
   public static class Source {
-    @Param({"xshrs", "xshrr", "mix32", "mix64", "splitRng", "split1", "split2", "split3",})
+    @Param({"xshrs", "xshrr", "mix32", "mix64", "msws",
+      // For testing the nextInt(int) implementation
+      //"splitRng", "split1", "split2", "split3",
+      })
     private String name;
 
     /** The random generator. */
@@ -161,6 +172,8 @@ public class RngNextIntInRangeBenchmark {
         rng = SplitMix.new32(seed.nextLong());
       } else if ("mix64".equals(name)) {
         rng = SplitMix.new64(seed.nextLong());
+      } else if ("msws".equals(name)) {
+        rng = MiddleSquareWeylSequence.newInstance(seed.nextLong());
       } else if ("splitRng".equals(name)) {
         rng = new TestSplitMix(seed.nextLong());
       } else if ("split1".equals(name)) {
