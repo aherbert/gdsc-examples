@@ -38,6 +38,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -68,6 +69,12 @@ public class ClosestPairBenchmark {
     /** The points. */
     private Point2D[] points;
 
+    /** The points. */
+    private List<Point2D> pointsList;
+
+    /** The points. */
+    private ArrayList<Point2D> pointsArrayList;
+
     /**
      * Gets the points.
      *
@@ -83,7 +90,16 @@ public class ClosestPairBenchmark {
      * @return the points list
      */
     public List<Point2D> getPointsList() {
-      return Arrays.asList(points);
+      return pointsList;
+    }
+
+    /**
+     * Gets the points array list.
+     *
+     * @return the points array list
+     */
+    public List<Point2D> getPointsArrayList() {
+      return pointsArrayList;
     }
 
     /** Create the samples. */
@@ -94,6 +110,8 @@ public class ClosestPairBenchmark {
       for (int i = 0; i < size; i++) {
         points[i] = new Point2D.Double(rng.nextDouble(), rng.nextDouble());
       }
+      pointsList = Arrays.asList(points);
+      pointsArrayList = new ArrayList<>(pointsList);
     }
   }
 
@@ -123,6 +141,18 @@ public class ClosestPairBenchmark {
   }
 
   /**
+   * Run the an all-vs-all algorithm using a generic list.
+   *
+   * @param points the points
+   * @return the pair
+   */
+  @Benchmark
+  public Object allVsAllAsArrayList(PointData points) {
+    return ClosestPairCalculator.closestPairAllVsAll(points.getPointsArrayList(), Point2D::getX,
+        Point2D::getY);
+  }
+
+  /**
    * Run the partitioned algorithm using an array.
    *
    * @param points the points
@@ -142,6 +172,18 @@ public class ClosestPairBenchmark {
   @Benchmark
   public Object partitionedAsList(PointData points) {
     return ClosestPairCalculator.closestPairPartitioned(points.getPointsList(), Point2D::getX,
+        Point2D::getY);
+  }
+
+  /**
+   * Run the partitioned algorithm using a generic list.
+   *
+   * @param points the points
+   * @return the pair
+   */
+  @Benchmark
+  public Object partitionedAsArrayList(PointData points) {
+    return ClosestPairCalculator.closestPairPartitioned(points.getPointsArrayList(), Point2D::getX,
         Point2D::getY);
   }
 }
