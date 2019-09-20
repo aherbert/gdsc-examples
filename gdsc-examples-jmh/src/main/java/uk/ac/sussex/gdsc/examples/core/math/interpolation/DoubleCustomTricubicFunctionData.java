@@ -47,6 +47,8 @@ public class DoubleCustomTricubicFunctionData {
     this.coeff = coefficients;
   }
 
+  // @CHECKSTYLE.OFF: JavadocMethod
+
   public double value000() {
     return coeff.x0y0z0;
   }
@@ -276,6 +278,7 @@ public class DoubleCustomTricubicFunctionData {
   // CHECKSTYLE.ON: VariableDeclarationUsageDistance
 
   public double value(DoubleCubicSplineData table) {
+    //@formatter:off
     return coeff.x0y0z0
         +  table.x1y0z0 * coeff.x1y0z0
         +  table.x2y0z0 * coeff.x2y0z0
@@ -295,6 +298,7 @@ public class DoubleCustomTricubicFunctionData {
         +  table.x0y1z3 * (coeff.x0y1z3 + table.x1y0z0 * coeff.x1y1z3 + table.x2y0z0 * coeff.x2y1z3 + table.x3y0z0 * coeff.x3y1z3)
         +  table.x0y2z3 * (coeff.x0y2z3 + table.x1y0z0 * coeff.x1y2z3 + table.x2y0z0 * coeff.x2y2z3 + table.x3y0z0 * coeff.x3y2z3)
         +  table.x0y3z3 * (coeff.x0y3z3 + table.x1y0z0 * coeff.x1y3z3 + table.x2y0z0 * coeff.x2y3z3 + table.x3y0z0 * coeff.x3y3z3);
+    //@formatter:on
   }
 
   public double value(FloatCubicSplineData table) {

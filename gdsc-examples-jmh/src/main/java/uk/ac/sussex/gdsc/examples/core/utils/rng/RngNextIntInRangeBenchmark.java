@@ -106,14 +106,13 @@ public class RngNextIntInRangeBenchmark {
     /**
      * The size of the data.
      *
-     * <p>Note: Large arrays may be limited by cache misses during the swap operation.
-     * This will not be a problem for the pseudo-shuffle benchmark.
+     * <p>Note: Large arrays may be limited by cache misses during the swap operation. This will not
+     * be a problem for the pseudo-shuffle benchmark.
      */
-    @Param({//"16", "256", 
-      //"4096",
-      //"16384",
-      "65536"
-      })
+    @Param({// "16", "256",
+        // "4096",
+        // "16384",
+        "65536"})
     private int size;
 
     /** The data. */
@@ -142,10 +141,11 @@ public class RngNextIntInRangeBenchmark {
    */
   @State(Scope.Benchmark)
   public static class Source {
-    @Param({"xshrs", "xshrr", "mix32", "mix64", "msws",
-      // For testing the nextInt(int) implementation
-      //"splitRng", "split1", "split2", "split3",
-      })
+    @Param({
+        // For testing the nextInt(int) implementation
+        // "splitRng", "split1", "split2", "split3",
+        // Test the generators
+        "xshrs", "xshrr", "mix32", "mix64", "msws",})
     private String name;
 
     /** The random generator. */

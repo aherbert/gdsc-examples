@@ -53,9 +53,6 @@ public class TricubicFunctionBenchmark {
   /** Number of samples per run. */
   private static final int NUM_SAMPLES = 100;
 
-  // TODO - update this so x, y and z are different because the JIT compiler may know they are the
-  // same and optimise the function call.
-
   /** The x position. */
   private static final CubicSplinePosition[] x;
   /** The Y position. */
@@ -99,7 +96,7 @@ public class TricubicFunctionBenchmark {
 
 
   static {
-    ThreadLocalRandom rng = ThreadLocalRandom.current();
+    final ThreadLocalRandom rng = ThreadLocalRandom.current();
     x = new CubicSplinePosition[NUM_SAMPLES];
     y = new CubicSplinePosition[NUM_SAMPLES];
     z = new CubicSplinePosition[NUM_SAMPLES];
@@ -127,7 +124,7 @@ public class TricubicFunctionBenchmark {
       powerYF[i] = SimpleArrayUtils.toFloat(powerY[i]);
       powerZ[i] = new double[] {z[i].x1, z[i].x2, z[i].x3};
       powerZF[i] = SimpleArrayUtils.toFloat(powerZ[i]);
-      double[] tmp = computePowerTable(powerX[i], powerY[i], powerZ[i]);
+      final double[] tmp = computePowerTable(powerX[i], powerY[i], powerZ[i]);
       arrayTables[i] = tmp;
       arrayTables2[i] = multiply(tmp, 2);
       arrayTables3[i] = multiply(tmp, 3);
@@ -142,7 +139,7 @@ public class TricubicFunctionBenchmark {
     arrayFF = new FloatCustomTricubicFunctionArray[NUM_FUNCTIONS];
     dataF = new DoubleCustomTricubicFunctionData[NUM_FUNCTIONS];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      double[] tmp = createCoefficients(rng);
+      final double[] tmp = createCoefficients(rng);
       arrayF[i] = new DoubleCustomTricubicFunctionArray(tmp);
       arrayFF[i] = new FloatCustomTricubicFunctionArray(SimpleArrayUtils.toFloat(tmp));
       dataF[i] = new DoubleCustomTricubicFunctionData(new DoubleCubicSplineData(tmp));
@@ -150,7 +147,7 @@ public class TricubicFunctionBenchmark {
   }
 
   private static double[] createCoefficients(ThreadLocalRandom rng) {
-    double[] tmp = new double[64];
+    final double[] tmp = new double[64];
     for (int i = 0; i < tmp.length; i++) {
       tmp[i] = rng.nextDouble(456);
     }
@@ -260,14 +257,16 @@ public class TricubicFunctionBenchmark {
   }
 
   // Benchmarks methods below.
+  // @CHECKSTYLE.OFF: JavadocMethod
+  // @CHECKSTYLE.OFF: AbbreviationAsWordInName
 
   // Non precomputed powers
 
-  //@Benchmark
+  // @Benchmark
   public void arrayValue0(Blackhole bh) {
     final Sink64 sink = new Sink64();
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionArray f = arrayF[i];
+      final DoubleCustomTricubicFunctionArray f = arrayF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value0(powerX[j], powerY[j], powerZ[j]));
       }
@@ -275,11 +274,11 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayDFValue0(Blackhole bh) {
     final Sink64 sink = new Sink64();
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      FloatCustomTricubicFunctionArray f = arrayFF[i];
+      final FloatCustomTricubicFunctionArray f = arrayFF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value0(powerX[j], powerY[j], powerZ[j]));
       }
@@ -287,11 +286,11 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayFFValue0(Blackhole bh) {
     final Sink64 sink = new Sink64();
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      FloatCustomTricubicFunctionArray f = arrayFF[i];
+      final FloatCustomTricubicFunctionArray f = arrayFF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value0(powerXF[j], powerYF[j], powerZF[j]));
       }
@@ -303,7 +302,7 @@ public class TricubicFunctionBenchmark {
   public void dataValue0(Blackhole bh) {
     final Sink64 sink = new Sink64();
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionData f = dataF[i];
+      final DoubleCustomTricubicFunctionData f = dataF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value0(x[j], y[j], z[j]));
       }
@@ -311,12 +310,12 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayValue1(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionArray f = arrayF[i];
+      final DoubleCustomTricubicFunctionArray f = arrayF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value1(powerX[j], powerY[j], powerZ[j], derivative1));
         sink.put(derivative1);
@@ -325,12 +324,12 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayDFValue1(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      FloatCustomTricubicFunctionArray f = arrayFF[i];
+      final FloatCustomTricubicFunctionArray f = arrayFF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value1(powerX[j], powerY[j], powerZ[j], derivative1));
         sink.put(derivative1);
@@ -339,12 +338,12 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayFFValue1(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      FloatCustomTricubicFunctionArray f = arrayFF[i];
+      final FloatCustomTricubicFunctionArray f = arrayFF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value1(powerXF[j], powerYF[j], powerZF[j], derivative1));
         sink.put(derivative1);
@@ -353,12 +352,12 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void dataValue1(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionData f = dataF[i];
+      final DoubleCustomTricubicFunctionData f = dataF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value1(x[j], y[j], z[j], derivative1));
         sink.put(derivative1);
@@ -367,13 +366,13 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayValue2(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     final double[] derivative2 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionArray f = arrayF[i];
+      final DoubleCustomTricubicFunctionArray f = arrayF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value2(powerX[j], powerY[j], powerZ[j], derivative1, derivative2));
         sink.put(derivative1);
@@ -383,13 +382,13 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayDFValue2(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     final double[] derivative2 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      FloatCustomTricubicFunctionArray f = arrayFF[i];
+      final FloatCustomTricubicFunctionArray f = arrayFF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value2(powerX[j], powerY[j], powerZ[j], derivative1, derivative2));
         sink.put(derivative1);
@@ -399,13 +398,13 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayFFValue2(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     final double[] derivative2 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      FloatCustomTricubicFunctionArray f = arrayFF[i];
+      final FloatCustomTricubicFunctionArray f = arrayFF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value2(powerXF[j], powerYF[j], powerZF[j], derivative1, derivative2));
         sink.put(derivative1);
@@ -415,13 +414,13 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void dataValue2(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     final double[] derivative2 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionData f = dataF[i];
+      final DoubleCustomTricubicFunctionData f = dataF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value2(x[j], y[j], z[j], derivative1, derivative2));
         sink.put(derivative1);
@@ -437,7 +436,7 @@ public class TricubicFunctionBenchmark {
   public void arrayPreValue0(Blackhole bh) {
     final Sink64 sink = new Sink64();
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionArray f = arrayF[i];
+      final DoubleCustomTricubicFunctionArray f = arrayF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value(arrayTables[j]));
       }
@@ -449,7 +448,7 @@ public class TricubicFunctionBenchmark {
   public void dataPreValue0(Blackhole bh) {
     final Sink64 sink = new Sink64();
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionData f = dataF[i];
+      final DoubleCustomTricubicFunctionData f = dataF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value(dataTables[j]));
       }
@@ -457,12 +456,12 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayPreValue1(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionArray f = arrayF[i];
+      final DoubleCustomTricubicFunctionArray f = arrayF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value(arrayTables[j], derivative1));
         sink.put(derivative1);
@@ -471,12 +470,12 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void dataPreValue1(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionData f = dataF[i];
+      final DoubleCustomTricubicFunctionData f = dataF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value(dataTables[j], derivative1));
         sink.put(derivative1);
@@ -485,13 +484,13 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayPreValue2(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     final double[] derivative2 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionArray f = arrayF[i];
+      final DoubleCustomTricubicFunctionArray f = arrayF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value(arrayTables[j], derivative1, derivative2));
         sink.put(derivative1);
@@ -501,13 +500,13 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void dataPreValue2(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     final double[] derivative2 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionData f = dataF[i];
+      final DoubleCustomTricubicFunctionData f = dataF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value(dataTables[j], derivative1, derivative2));
         sink.put(derivative1);
@@ -519,12 +518,12 @@ public class TricubicFunctionBenchmark {
 
   // Pre-computed powers with scaled tables
 
-  //@Benchmark
+  // @Benchmark
   public void arrayPreScaledValue1(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionArray f = arrayF[i];
+      final DoubleCustomTricubicFunctionArray f = arrayF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value(arrayTables[j], arrayTables2[j], arrayTables3[j], derivative1));
         sink.put(derivative1);
@@ -533,12 +532,12 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void dataPreScaledValue1(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionData f = dataF[i];
+      final DoubleCustomTricubicFunctionData f = dataF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value(dataTables[j], dataTables2[j], dataTables3[j], derivative1));
         sink.put(derivative1);
@@ -547,13 +546,13 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void arrayPreScaledValue2(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     final double[] derivative2 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionArray f = arrayF[i];
+      final DoubleCustomTricubicFunctionArray f = arrayF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value(arrayTables[j], arrayTables2[j], arrayTables3[j], arrayTables6[j],
             derivative1, derivative2));
@@ -564,13 +563,13 @@ public class TricubicFunctionBenchmark {
     bh.consume(sink.counter);
   }
 
-  //@Benchmark
+  // @Benchmark
   public void dataPreScaledValue2(Blackhole bh) {
     final Sink64 sink = new Sink64();
     final double[] derivative1 = new double[3];
     final double[] derivative2 = new double[3];
     for (int i = 0; i < NUM_FUNCTIONS; i++) {
-      DoubleCustomTricubicFunctionData f = dataF[i];
+      final DoubleCustomTricubicFunctionData f = dataF[i];
       for (int j = 0; j < NUM_SAMPLES; j++) {
         sink.put(f.value(dataTables[j], dataTables2[j], dataTables3[j], dataTables6[j], derivative1,
             derivative2));

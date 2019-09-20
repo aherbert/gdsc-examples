@@ -17,6 +17,8 @@ public class DoubleCustomTricubicFunctionArray {
     this.coeff = coefficients;
   }
 
+  // @CHECKSTYLE.OFF: JavadocMethod
+
   public double value000() {
     return coeff[0];
   }
