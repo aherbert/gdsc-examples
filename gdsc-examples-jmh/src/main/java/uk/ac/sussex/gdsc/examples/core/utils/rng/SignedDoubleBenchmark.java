@@ -22,6 +22,7 @@
 
 package uk.ac.sussex.gdsc.examples.core.utils.rng;
 
+import uk.ac.sussex.gdsc.core.utils.rng.NumberUtils;
 import uk.ac.sussex.gdsc.core.utils.rng.XoRoShiRo128PP;
 
 import org.apache.commons.rng.UniformRandomProvider;
@@ -113,5 +114,10 @@ public class SignedDoubleBenchmark {
   @Benchmark
   public double nextSignedDoubleRng() {
     return rng.nextDouble() - rng.nextInt(1);
+  }
+
+  @Benchmark
+  public double nextSignedDouble() {
+    return NumberUtils.makeSignedDouble(rng.nextLong());
   }
 }
