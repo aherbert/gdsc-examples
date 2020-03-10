@@ -19,6 +19,7 @@
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * #L%
  */
+
 package uk.ac.sussex.gdsc.examples.core.math.interpolation;
 
 /**
@@ -38,7 +39,7 @@ public class FloatCustomTricubicFunctionArray {
     this.coeff = coefficients;
   }
 
-  // @CHECKSTYLE.OFF: JavadocMethod
+  // CHECKSTYLE.OFF: JavadocMethod
 
   public double value000() {
     return coeff[0];

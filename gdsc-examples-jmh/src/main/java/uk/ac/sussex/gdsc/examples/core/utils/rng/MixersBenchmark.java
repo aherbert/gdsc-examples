@@ -22,8 +22,10 @@
 
 package uk.ac.sussex.gdsc.examples.core.utils.rng;
 
-import uk.ac.sussex.gdsc.core.utils.rng.Mixers;
-
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+import java.util.function.LongUnaryOperator;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -35,11 +37,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.function.LongUnaryOperator;
+import uk.ac.sussex.gdsc.core.utils.rng.Mixers;
 
 /**
  * Executes benchmark to compare the speed of generation of 64-bit mix functions.

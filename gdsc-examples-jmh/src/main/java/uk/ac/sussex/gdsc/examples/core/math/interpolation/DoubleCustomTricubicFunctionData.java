@@ -41,7 +41,7 @@ public class DoubleCustomTricubicFunctionData {
     this.coeff = coefficients;
   }
 
-  // @CHECKSTYLE.OFF: JavadocMethod
+  // CHECKSTYLE.OFF: JavadocMethod
 
   public double value000() {
     return coeff.x0y0z0;

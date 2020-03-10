@@ -22,9 +22,10 @@
 
 package uk.ac.sussex.gdsc.examples.core.utils.rng;
 
-import uk.ac.sussex.gdsc.core.utils.rng.AsciiStringSampler;
-import uk.ac.sussex.gdsc.core.utils.rng.RadixStringSampler;
-
+import java.util.Arrays;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -45,11 +46,8 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
-
-import java.util.Arrays;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
+import uk.ac.sussex.gdsc.core.utils.rng.AsciiStringSampler;
+import uk.ac.sussex.gdsc.core.utils.rng.RadixStringSampler;
 
 /**
  * Executes benchmark to compare the speed of generation of Hex strings.

@@ -22,9 +22,7 @@
 
 package uk.ac.sussex.gdsc.examples.core.utils.rng;
 
-import uk.ac.sussex.gdsc.core.utils.rng.NumberUtils;
-import uk.ac.sussex.gdsc.core.utils.rng.XoRoShiRo128PP;
-
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.rng.UniformRandomProvider;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -35,8 +33,8 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-
-import java.util.concurrent.TimeUnit;
+import uk.ac.sussex.gdsc.core.utils.rng.NumberUtils;
+import uk.ac.sussex.gdsc.core.utils.rng.XoRoShiRo128PP;
 
 /**
  * Executes benchmark to compare the speed of producing numbers in the range {@code [-1, 1)}.

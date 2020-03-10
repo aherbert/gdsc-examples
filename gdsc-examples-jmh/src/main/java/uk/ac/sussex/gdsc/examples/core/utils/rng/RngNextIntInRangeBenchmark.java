@@ -22,11 +22,10 @@
 
 package uk.ac.sussex.gdsc.examples.core.utils.rng;
 
-import uk.ac.sussex.gdsc.core.utils.rng.MiddleSquareWeylSequence;
-import uk.ac.sussex.gdsc.core.utils.rng.Pcg32;
-import uk.ac.sussex.gdsc.core.utils.rng.RandomUtils;
-import uk.ac.sussex.gdsc.core.utils.rng.SplitMix;
-
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.core.source32.IntProvider;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -41,11 +40,10 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
-
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
+import uk.ac.sussex.gdsc.core.utils.rng.MiddleSquareWeylSequence;
+import uk.ac.sussex.gdsc.core.utils.rng.Pcg32;
+import uk.ac.sussex.gdsc.core.utils.rng.RandomUtils;
+import uk.ac.sussex.gdsc.core.utils.rng.SplitMix;
 
 /**
  * Executes benchmark to compare the speed of random number generators to create an int value in a

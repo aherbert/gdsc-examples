@@ -22,8 +22,10 @@
 
 package uk.ac.sussex.gdsc.examples.core.utils.rng;
 
-import uk.ac.sussex.gdsc.test.utils.TestLogUtils;
-
+import java.util.Arrays;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.logging.Logger;
 import org.apache.commons.math3.stat.inference.ChiSquareTest;
 import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.simple.RandomSource;
@@ -31,11 +33,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
-import java.util.logging.Logger;
+import uk.ac.sussex.gdsc.test.utils.TestLogUtils;
 
 @SuppressWarnings("javadoc")
 public class HexStringSamplerBenchmarkTest {
