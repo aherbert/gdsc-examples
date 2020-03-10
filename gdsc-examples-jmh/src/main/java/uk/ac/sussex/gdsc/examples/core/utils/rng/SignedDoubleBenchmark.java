@@ -2,7 +2,7 @@
  * #%L
  * Code for running JMH benchmarks to assess performance.
  * %%
- * Copyright (C) 2018 - 2019 Alex Herbert
+ * Copyright (C) 2018 - 2020 Alex Herbert
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -51,7 +51,7 @@ public class SignedDoubleBenchmark {
   /** The value. Must NOT be final to prevent JVM optimisation! */
   private double doubleValue;
   /**
-   * The rng. 
+   * The rng.
    * Extend the benchmark to make this configurable as the type of RNG affects
    * the speed of methods that call the rng twice.
    */
