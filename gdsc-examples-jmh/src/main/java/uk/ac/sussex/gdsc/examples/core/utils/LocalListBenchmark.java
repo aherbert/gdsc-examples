@@ -29,6 +29,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SplittableRandom;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
@@ -36,6 +37,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -50,7 +52,6 @@ import org.openjdk.jmh.annotations.Warmup;
 import uk.ac.sussex.gdsc.core.utils.LocalList;
 import uk.ac.sussex.gdsc.core.utils.MathUtils;
 
-// TODO: Auto-generated Javadoc
 /**
  * Executes benchmark to compare the speed of List operations.
  */
@@ -63,16 +64,55 @@ import uk.ac.sussex.gdsc.core.utils.MathUtils;
 public class LocalListBenchmark {
 
   /**
-   * The source data.
+   * The source data size.
    */
   @State(Scope.Benchmark)
-  public static class Source {
+  public static class SourceSize {
     /** The size. */
     @Param({"10000"})
     private int size;
 
+    /** The scratch space. */
+    private Object[] scratch;
+
+    /**
+     * Gets the size.
+     *
+     * @return the size
+     */
+    public int getSize() {
+      return size;
+    }
+
+    /**
+     * Gets the scratch space.
+     *
+     * @return the scratch space
+     */
+    public Object[] getScratchSpace() {
+      return scratch;
+    }
+
+    /**
+     * Create the scratch space.
+     */
+    @Setup
+    public void setup() {
+      scratch = new Object[size];
+    }
+  }
+
+  /**
+   * The source data.
+   */
+  @State(Scope.Benchmark)
+  public static class Source extends SourceSize {
+    /** The order of the data. */
+    @Param({"natural", "random"})
+    private String order;
+
     /** The list. */
-    @Param({"LocalList", "List"})
+    @Param({"List", "LocalList"})
     private String list;
 
     /** Flag indicating the collector is for a local list. */
@@ -111,6 +151,17 @@ public class LocalListBenchmark {
     }
 
     /**
+     * Creates a new list with the given capacity.
+     *
+     * @param <T> the generic type
+     * @param capacity the capacity
+     * @return the list
+     */
+    public <T> List<T> createList(int capacity) {
+      return isLocalList ? new LocalList<>(capacity) : new ArrayList<>(capacity);
+    }
+
+    /**
      * Creates a new list from the collection.
      *
      * @param <T> the generic type
@@ -124,9 +175,15 @@ public class LocalListBenchmark {
     /**
      * Create the data.
      */
+    @Override
     @Setup
     public void setup() {
-      data = new SplittableRandom().ints(size).boxed().collect(Collectors.toList());
+      super.setup();
+      if ("random".equals(order)) {
+        data = new SplittableRandom().ints(getSize()).boxed().collect(Collectors.toList());
+      } else {
+        data = IntStream.range(0, getSize()).boxed().collect(Collectors.toList());
+      }
       isLocalList = "LocalList".equals(list);
       if (isLocalList) {
         data = new LocalList<>(data);
@@ -137,8 +194,8 @@ public class LocalListBenchmark {
   }
 
   /**
-   * Returns a {@code Collector} that accumulates the input elements into a new {@code LocalList} as
-   * a {@code List}.
+   * Returns a {@code Collector} that accumulates the input elements into a new {@code LocalList}
+   * as a {@code List}.
    *
    * @param <T> the type of the input elements
    * @return a {@code Collector} which collects all the input elements into a {@code LocalList}, in
@@ -243,6 +300,38 @@ public class LocalListBenchmark {
   }
 
   /**
+   * Use the get method to access the contents.
+   *
+   * @param source source of the list
+   * @return the contents
+   */
+  @Benchmark
+  public Object[] get(Source source) {
+    final List<Integer> ll = source.getData();
+    final Object[] scratch = source.getScratchSpace();
+    for (int i = 0; i < ll.size(); i++) {
+      scratch[i] = ll.get(i);
+    }
+    return scratch;
+  }
+
+  /**
+   * Use the get method to sum the contents.
+   *
+   * @param source source of the list
+   * @return the sum
+   */
+  @Benchmark
+  public long sumUsingGet(Source source) {
+    long sum = 0;
+    final List<Integer> ll = source.getData();
+    for (int i = 0; i < ll.size(); i++) {
+      sum += ll.get(i);
+    }
+    return sum;
+  }
+
+  /**
    * Use the unsafe get method to sum the contents.
    *
    * @param source source of the list
@@ -266,18 +355,60 @@ public class LocalListBenchmark {
   }
 
   /**
-   * Use the get method to sum the contents.
+   * Use the add method to fill the contents.
    *
    * @param source source of the list
-   * @return the sum
+   * @return the list
    */
   @Benchmark
-  public long sumUsingGet(Source source) {
-    long sum = 0;
-    final List<Integer> ll = source.getData();
-    for (int i = 0; i < ll.size(); i++) {
-      sum += ll.get(i);
+  public List<Object> fillUsingAdd(Source source) {
+    final List<Object> ll = source.createList();
+    for (int i = source.getSize(); i-- > 0;) {
+      ll.add(ll);
     }
-    return sum;
+    return ll;
+  }
+
+  /**
+   * Use the add method to fill the contents.
+   *
+   * @param source source of the list
+   * @return the list
+   */
+  @Benchmark
+  public List<Object> fillCapacityUsingAdd(Source source) {
+    final List<Object> ll = source.createList(source.getSize());
+    for (int i = source.getSize(); i-- > 0;) {
+      ll.add(ll);
+    }
+    return ll;
+  }
+
+  /**
+   * Use the add method to fill the contents.
+   *
+   * @param source source of the list
+   * @return the list
+   */
+  @Benchmark
+  public List<Object> fillCapacityUsingPush(SourceSize source) {
+    final LocalList<Object> ll = new LocalList<>(source.getSize());
+    for (int i = source.getSize(); i-- > 0;) {
+      ll.push(ll);
+    }
+    return ll;
+  }
+
+  /**
+   * Perform a shuffle.
+   *
+   * @param source source of the list
+   * @return the list
+   */
+  @Benchmark
+  public List<Integer> shuffle(Source source) {
+    final List<Integer> ll = source.getData();
+    Collections.shuffle(ll, ThreadLocalRandom.current());
+    return ll;
   }
 }
