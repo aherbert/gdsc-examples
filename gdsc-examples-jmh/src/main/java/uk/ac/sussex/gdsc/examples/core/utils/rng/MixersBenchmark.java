@@ -89,7 +89,7 @@ public class MixersBenchmark {
   @State(Scope.Benchmark)
   public static class MixFunction {
     @Param({"rxsmxs", "rxsmxsUnmix", "rrmxmx", "rrmxmxUnmix", "rrxmrrxmsx0", "rrxmrrxmsx0b",
-        "murmur3", "stafford13", "pelican"})
+        "murmur3", "stafford13", "pelican", "lea"})
     private String name;
 
     /** The function. */
@@ -125,6 +125,8 @@ public class MixersBenchmark {
         function = Mixers::stafford13;
       } else if ("pelican".equals(name)) {
         function = MixersBenchmark::pelican;
+      } else if ("lea".equals(name)) {
+        function = MixersBenchmark::lea;
       }
     }
   }
@@ -235,6 +237,21 @@ public class MixersBenchmark {
         * 0xAEF17502108EF2D9L;
     x = (x ^ x >>> 43 ^ x >>> 31 ^ x >>> 23) * 0xDB4F0B9175AE2165L;
     return (x ^ x >>> 28);
+  }
+
+  /**
+   * Perform the 64-bit mix function of Doug Lea.
+   *
+   * <p>The constants can be viewed in the JDK 17 source code:
+   * {@code src/java.base/share/classes/jdk/internal/util/random/RandomSupport.java}.
+   *
+   * @param x the input value
+   * @return the output value
+   */
+  private static long lea(long x) {
+      x = (x ^ (x >>> 32)) * 0xdaba0b6eb09322e3L;
+      x = (x ^ (x >>> 32)) * 0xdaba0b6eb09322e3L;
+      return x ^ (x >>> 32);
   }
 
   /**
