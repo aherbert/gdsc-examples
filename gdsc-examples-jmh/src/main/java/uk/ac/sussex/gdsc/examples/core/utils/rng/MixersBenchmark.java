@@ -212,7 +212,7 @@ public class MixersBenchmark {
    *      href="http://mostlymangling.blogspot.com/2019/01/better-stronger-mixer-and-test-procedure.html">
    *      Better, stronger mixer and a test procedure.</a>
    */
-  public static long rrxmrrxmsx0(long x) {
+  private static long rrxmrrxmsx0(long x) {
     // Testing the removal of Long.rotateRight
     // x ^= Long.rotateRight(x, 25) ^ Long.rotateRight(x, 50)
     x ^= (x >>> 25 | x << 39) ^ (x >>> 50 | x << 14);
@@ -232,7 +232,7 @@ public class MixersBenchmark {
    *      href="https://github.com/tommyettinger/sarong/blob/master/src/main/java/sarong/PelicanRNG.java">
    *      PelicanRNG.</a>
    */
-  public static long pelican(long x) {
+  private static long pelican(long x) {
     x = (x ^ (x << 41 | x >>> 23) ^ (x << 17 | x >>> 47) ^ 0xD1B54A32D192ED03L)
         * 0xAEF17502108EF2D9L;
     x = (x ^ x >>> 43 ^ x >>> 31 ^ x >>> 23) * 0xDB4F0B9175AE2165L;
@@ -240,18 +240,18 @@ public class MixersBenchmark {
   }
 
   /**
-   * Perform the 64-bit mix function of Doug Lea.
-   *
-   * <p>The constants can be viewed in the JDK 17 source code:
-   * {@code src/java.base/share/classes/jdk/internal/util/random/RandomSupport.java}.
+   * Perform a 64-bit mixing function consisting of alternating xor operations with a right-shifted
+   * state and multiplications. This is based on the original 64-bit mix function of Austin
+   * Appleby's MurmurHash3 modified to use Doug Lea's 64-bit mix constants and shifts as found
+   * in the random generators in JDK 17.
    *
    * @param x the input value
    * @return the output value
    */
   private static long lea(long x) {
-      x = (x ^ (x >>> 32)) * 0xdaba0b6eb09322e3L;
-      x = (x ^ (x >>> 32)) * 0xdaba0b6eb09322e3L;
-      return x ^ (x >>> 32);
+    x = (x ^ (x >>> 32)) * 0xdaba0b6eb09322e3L;
+    x = (x ^ (x >>> 32)) * 0xdaba0b6eb09322e3L;
+    return x ^ (x >>> 32);
   }
 
   /**
