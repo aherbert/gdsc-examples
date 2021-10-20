@@ -102,6 +102,15 @@
           <source>${maven.compiler.source}</source>
         </configuration>
       </plugin>
+      <!-- Workaround for
+           java.lang.IllegalStateException: endPosTable already set on repeated mvn compile
+           See: https://github.com/immutables/immutables/issues/134 -->
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <useIncrementalCompilation>false</useIncrementalCompilation>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
