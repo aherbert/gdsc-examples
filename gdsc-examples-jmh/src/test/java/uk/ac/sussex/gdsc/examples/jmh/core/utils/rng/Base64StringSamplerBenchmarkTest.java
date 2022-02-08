@@ -95,7 +95,7 @@ class Base64StringSamplerBenchmarkTest {
 
   private void
       testSamplesAreUniform(BiFunction<UniformRandomProvider, Integer, Supplier<String>> fun) {
-    final UniformRandomProvider rng = RandomSource.create(RandomSource.MWC_256);
+    final UniformRandomProvider rng = RandomSource.MWC_256.create();
     final int length = 1000;
     final int repeats = 100;
     final long[] h = new long[64];
