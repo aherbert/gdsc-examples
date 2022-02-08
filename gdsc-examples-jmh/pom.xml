@@ -23,6 +23,7 @@
   </licenses>
 
   <properties>
+    <gdsc.automatic.module.name>uk.ac.sussex.gdsc.examples.jmh</gdsc.automatic.module.name>
     <!-- Workaround to avoid duplicating config files. -->
     <gdsc.parent.dir>${basedir}/..</gdsc.parent.dir>
     <jmh.version>1.34</jmh.version>
