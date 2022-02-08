@@ -66,19 +66,16 @@ class HexStringSamplerBenchmarkTest {
     throw new AssertionError("Unsupported character: '" + ch + "'");
   }
 
-  @SuppressWarnings("null")
   @Test
   void testNextBytesHexEncode() {
     testSamplesAreUniform(HexStringSamplerBenchmark::getNextBytesHexEncode);
   }
 
-  @SuppressWarnings("null")
   @Test
   void testNextHexStringModified() {
     testSamplesAreUniform(HexStringSamplerBenchmark::getNextHexStringModified);
   }
 
-  @SuppressWarnings("null")
   @Test
   void testNextHexStringOriginal() {
     testSamplesAreUniform(HexStringSamplerBenchmark::getNextHexStringOriginal);

@@ -78,19 +78,16 @@ class Base64StringSamplerBenchmarkTest {
     throw new AssertionError("Unsupported character: '" + ch + "'");
   }
 
-  @SuppressWarnings("null")
   @Test
   void testBase64StringUsing30of32() {
     testSamplesAreUniform(Base64StringSamplerBenchmark::getBase64StringUsing30of32);
   }
 
-  @SuppressWarnings("null")
   @Test
   void testBase64ArrayThenNewAsciiString() {
     testSamplesAreUniform(Base64StringSamplerBenchmark::getBase64ArrayThenNewAsciiString);
   }
 
-  @SuppressWarnings("null")
   @Test
   void testNextBytesAndBase64Encode() {
     testSamplesAreUniform(Base64StringSamplerBenchmark::getNextBytesAndBase64Encode);
