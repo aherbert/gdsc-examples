@@ -36,17 +36,17 @@ import org.junit.jupiter.api.Test;
 import uk.ac.sussex.gdsc.test.utils.TestLogUtils;
 
 @SuppressWarnings("javadoc")
-public class Base64StringSamplerBenchmarkTest {
+class Base64StringSamplerBenchmarkTest {
 
   private static Logger logger;
 
   @BeforeAll
-  public static void beforeAll() {
+  static void beforeAll() {
     logger = Logger.getLogger(Base64StringSamplerBenchmarkTest.class.getName());
   }
 
   @AfterAll
-  public static void afterAll() {
+  static void afterAll() {
     logger = null;
   }
 
@@ -80,19 +80,19 @@ public class Base64StringSamplerBenchmarkTest {
 
   @SuppressWarnings("null")
   @Test
-  public void testBase64StringUsing30of32() {
+  void testBase64StringUsing30of32() {
     testSamplesAreUniform(Base64StringSamplerBenchmark::getBase64StringUsing30of32);
   }
 
   @SuppressWarnings("null")
   @Test
-  public void testBase64ArrayThenNewAsciiString() {
+  void testBase64ArrayThenNewAsciiString() {
     testSamplesAreUniform(Base64StringSamplerBenchmark::getBase64ArrayThenNewAsciiString);
   }
 
   @SuppressWarnings("null")
   @Test
-  public void testNextBytesAndBase64Encode() {
+  void testNextBytesAndBase64Encode() {
     testSamplesAreUniform(Base64StringSamplerBenchmark::getNextBytesAndBase64Encode);
   }
 

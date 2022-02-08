@@ -36,17 +36,17 @@ import org.junit.jupiter.api.Test;
 import uk.ac.sussex.gdsc.test.utils.TestLogUtils;
 
 @SuppressWarnings("javadoc")
-public class HexStringSamplerBenchmarkTest {
+class HexStringSamplerBenchmarkTest {
 
   private static Logger logger;
 
   @BeforeAll
-  public static void beforeAll() {
+  static void beforeAll() {
     logger = Logger.getLogger(HexStringSamplerBenchmarkTest.class.getName());
   }
 
   @AfterAll
-  public static void afterAll() {
+  static void afterAll() {
     logger = null;
   }
 
@@ -68,19 +68,19 @@ public class HexStringSamplerBenchmarkTest {
 
   @SuppressWarnings("null")
   @Test
-  public void testNextBytesHexEncode() {
+  void testNextBytesHexEncode() {
     testSamplesAreUniform(HexStringSamplerBenchmark::getNextBytesHexEncode);
   }
 
   @SuppressWarnings("null")
   @Test
-  public void testNextHexStringModified() {
+  void testNextHexStringModified() {
     testSamplesAreUniform(HexStringSamplerBenchmark::getNextHexStringModified);
   }
 
   @SuppressWarnings("null")
   @Test
-  public void testNextHexStringOriginal() {
+  void testNextHexStringOriginal() {
     testSamplesAreUniform(HexStringSamplerBenchmark::getNextHexStringOriginal);
   }
 
