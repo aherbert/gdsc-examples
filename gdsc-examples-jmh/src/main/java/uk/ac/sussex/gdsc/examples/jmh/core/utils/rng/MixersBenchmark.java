@@ -89,7 +89,7 @@ public class MixersBenchmark {
   @State(Scope.Benchmark)
   public static class MixFunction {
     @Param({"rxsmxs", "rxsmxsUnmix", "rrmxmx", "rrmxmxUnmix", "rrxmrrxmsx0", "rrxmrrxmsx0b",
-        "murmur3", "stafford13", "pelican", "lea"})
+        "murmur3", "stafford13", "pelican", "lea64"})
     private String name;
 
     /** The function. */
@@ -125,8 +125,8 @@ public class MixersBenchmark {
         function = Mixers::stafford13;
       } else if ("pelican".equals(name)) {
         function = MixersBenchmark::pelican;
-      } else if ("lea".equals(name)) {
-        function = MixersBenchmark::lea;
+      } else if ("lea64".equals(name)) {
+        function = MixersBenchmark::lea64;
       }
     }
   }
@@ -242,13 +242,16 @@ public class MixersBenchmark {
   /**
    * Perform a 64-bit mixing function consisting of alternating xor operations with a right-shifted
    * state and multiplications. This is based on the original 64-bit mix function of Austin
-   * Appleby's MurmurHash3 modified to use Doug Lea's 64-bit mix constants and shifts as found
-   * in the random generators in JDK 17.
+   * Appleby's MurmurHash3 modified to use Doug Lea's 64-bit mix constants and shifts as found in
+   * the random generators in JDK 17.
    *
    * @param x the input value
    * @return the output value
+   * @see <a href="https://dl.acm.org/doi/10.1145/3460772">Blackman and Vigna (2021) Scrambled
+   *      Linear Psuedorandom Number Generators. ACM Transactions on Mathematical Software, vol 47,
+   *      pp 1–32.</a>
    */
-  private static long lea(long x) {
+  private static long lea64(long x) {
     x = (x ^ (x >>> 32)) * 0xdaba0b6eb09322e3L;
     x = (x ^ (x >>> 32)) * 0xdaba0b6eb09322e3L;
     return x ^ (x >>> 32);
