@@ -33,7 +33,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import uk.ac.sussex.gdsc.test.utils.TestLogUtils;
+import uk.ac.sussex.gdsc.test.utils.TestLogging;
 
 @SuppressWarnings("javadoc")
 class HexStringSamplerBenchmarkTest {
@@ -108,7 +108,7 @@ class HexStringSamplerBenchmarkTest {
     Arrays.fill(expected, 1.0 / 16);
     final double pvalue = chi.chiSquareTest(expected, h);
     final boolean reject = pvalue < 0.001;
-    logger.log(TestLogUtils.getResultRecord(!reject,
+    logger.log(TestLogging.getResultRecord(!reject,
         () -> String.format("chiSq p = %s  (reject=%b)", pvalue, reject)));
   }
 }
