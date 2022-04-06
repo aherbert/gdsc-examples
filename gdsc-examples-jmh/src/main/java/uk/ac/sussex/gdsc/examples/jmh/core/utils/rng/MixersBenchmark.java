@@ -247,9 +247,9 @@ public class MixersBenchmark {
    *
    * @param x the input value
    * @return the output value
-   * @see <a href="https://dl.acm.org/doi/10.1145/3460772">Blackman and Vigna (2021) Scrambled
-   *      Linear Psuedorandom Number Generators. ACM Transactions on Mathematical Software, vol 47,
-   *      pp 1–32.</a>
+   * @see <a href="https://doi.org/10.1145/3485525">Steele and Vigna (2021) LXM: better splittable
+   *      pseudorandom number generators (and almost as fast). Proc. ACM Programming Languages Vol
+   *      5, 1-31</a>
    */
   private static long lea64(long x) {
     x = (x ^ (x >>> 32)) * 0xdaba0b6eb09322e3L;
