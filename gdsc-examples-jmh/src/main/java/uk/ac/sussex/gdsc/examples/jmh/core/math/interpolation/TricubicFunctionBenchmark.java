@@ -92,7 +92,6 @@ public class TricubicFunctionBenchmark {
   /** Power tables * 6. */
   private static final DoubleCubicSplineData[] dataTables6;
 
-
   static {
     final ThreadLocalRandom rng = ThreadLocalRandom.current();
     x = new CubicSplinePosition[NUM_SAMPLES];
