@@ -5,7 +5,7 @@
   <parent>
     <groupId>uk.ac.sussex.gdsc</groupId>
     <artifactId>gdsc-ij-parent</artifactId>
-    <version>1.0</version>
+    <version>2.0-SNAPSHOT</version>
     <relativePath>../gdsc-ij-parent</relativePath>
   </parent>
 
@@ -73,9 +73,9 @@
     <gdsc.parent.dir>${basedir}</gdsc.parent.dir>
 
     <!-- Dependency versions -->
-    <gdsc.core.version>2.0-SNAPSHOT</gdsc.core.version>
-    <gdsc.version>1.4-SNAPSHOT</gdsc.version>
-    <gdsc.smlm.version>2.0-SNAPSHOT</gdsc.smlm.version>
+    <gdsc.core.version>2.1-SNAPSHOT</gdsc.core.version>
+    <gdsc.version>2.0-SNAPSHOT</gdsc.version>
+    <gdsc.smlm.version>1.1-SNAPSHOT</gdsc.smlm.version>
   </properties>
 
   <dependencyManagement>
