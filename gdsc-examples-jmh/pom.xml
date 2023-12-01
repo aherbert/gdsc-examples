@@ -53,8 +53,21 @@
     </dependency>
     <dependency>
       <groupId>uk.ac.sussex.gdsc</groupId>
+      <artifactId>gdsc-test-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>uk.ac.sussex.gdsc</groupId>
       <artifactId>gdsc-test-utils</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-rng-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-rng-simple</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
