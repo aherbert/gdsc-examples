@@ -41,7 +41,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 
 /**
- * Executes benchmark to compare the speed of computing {@code exp(-0.*x*x)}.
+ * Executes benchmark to compare the speed of computing {@code exp(-0.5*x*x)}.
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -85,7 +85,7 @@ public class ExpSqBenchmark {
       if ("baseline".equals(method)) {
         fun = x -> x;
       } else if ("exp".equals(method)) {
-        fun = x -> Math.exp(-x * x);
+        fun = x -> Math.exp(-0.5 * x * x);
       } else if ("expmhxx".equals(method)) {
         fun = ExpSqBenchmark::expmhxx;
       } else {
