@@ -97,11 +97,6 @@ class HexStringSamplerBenchmarkTest {
       }
     }
 
-    // double mean = (double) length * repeats / radix;
-    // for (int i = 0; i < h.length; i++) {
-    // System.out.printf("%2d = %d (%.2f)\n", i, h[i], h[i] / mean);
-    // }
-
     // Statistical test
     final ChiSquareTest chi = new ChiSquareTest();
     final double[] expected = new double[h.length];
